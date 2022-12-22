@@ -11,6 +11,7 @@ function GameLogic(props) {
     setColor,
     selectedPosition,
     setSelectedPosition,
+    kingChecker,
   } = props;
 
   const clearSelection = () => {
@@ -25,11 +26,11 @@ function GameLogic(props) {
     setSelectedPosition({});
   };
 
-  const movePiece = (startx, starty, endx, endy) => {
+  const movePiece = (startx, starty, endx, endy, deletedPiece="") => {
     const newPiecePosition = [...piecePosition];
 
     newPiecePosition[endx][endy].piece = newPiecePosition[startx][starty].piece;
-    newPiecePosition[startx][starty].piece = "";
+    newPiecePosition[startx][starty].piece = deletedPiece;
 
     setPiecePosition(newPiecePosition);
     clearSelection();
@@ -43,10 +44,14 @@ function GameLogic(props) {
     if (piecePosition[r][c].selected) {
       if (
         piecePosition[r][c].piece === "" ||
-        (piecePosition[r][c] !== "" && piecePosition[r][c].piece[0] !== color)
+        (piecePosition[r][c].piece !== "" && piecePosition[r][c].piece[0] !== color)
       ) {
         const { x, y } = selectedPosition;
+        const deletedPiece = piecePosition[r][c].piece;
         movePiece(x, y, r, c);
+        if(!kingChecker()){
+          movePiece(r, c, x, y, deletedPiece);
+        }
       }
       return;
     }
@@ -57,19 +62,21 @@ function GameLogic(props) {
     ) {
       clearSelection();
       return;
-    } else if (
-      piecePosition[r][c].piece[0] === color &&
-      piecePosition[r][c].selected
-    ) {
-      clearSelection();
-      return;
-    }
+    } 
+    // else if (
+    //   piecePosition[r][c].piece[0] === color &&
+    //   piecePosition[r][c].selected
+    // ) {
+    //   clearSelection();
+    //   return;
+    // }
 
     if (piecePosition[r][c].piece[0] !== color) {
       return;
-    } else if (piecePosition[r][c].piece[0] !== color) {
-      return;
-    }
+    } 
+    // else if (piecePosition[r][c].piece[0] !== color) {
+    //   return;
+    // }
     clearSelection();
 
     const newPiecePosition = [...piecePosition];

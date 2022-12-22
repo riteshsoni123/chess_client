@@ -176,6 +176,51 @@ function GameMovements() {
   //   console.log(selectedPosition);
   // }, [selectedPosition]);
 
+  const clearMovementsArray = () =>{
+    while (movements.length > 0) {
+      movements.pop();
+    }
+  }
+
+
+  const kingChecker = () => {
+    console.log("hi")
+
+    let r=-1,c=-1;
+    for(let i=0;i<8;i++){
+      for(let j=0;j<8;j++){
+        if(piecePosition[i][j].piece===`${color}_king`){
+          r=i;c=j;
+          break;
+        }
+      }
+      if(r!==-1&&c!==-1){
+        break;
+      }
+    }
+
+    console.log(r,c)
+    
+    for(let i=0;i<8;i++){
+      for(let j=0;j<8;j++){
+        const piece = piecePosition[i][j].piece;
+        if(piece[0]!==color){
+          clearMovementsArray();
+          movementsGenerator(piece.substring(2, piece.length),i, j, piece[0]);
+        }
+        for(let k=0;k<movements.length;k++){
+          const {x,y} = movements[k];
+          if(x===r&&y===c){
+            console.log("bazinga")
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+
+  };
+
   const selectPositions = () => {
     const newPiecePosition = [...piecePosition];
 
@@ -190,19 +235,23 @@ function GameMovements() {
     setPiecePosition(newPiecePosition);
   };
 
-  const pawnKillingMovement = (moves, x, y) => {
+  const pawnKillingMovement = (moves, x, y, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
-
-    pawnKillingMovement(moves - 1, x - 1, y + 1);
-    pawnKillingMovement(moves - 1, x - 1, y - 1);
+    if(tcolor===color){
+      pawnKillingMovement(moves - 1, x - 1, y + 1, tcolor);
+      pawnKillingMovement(moves - 1, x - 1, y - 1, tcolor);
+    }else{
+      pawnKillingMovement(moves - 1, x + 1, y + 1, tcolor);
+      pawnKillingMovement(moves - 1, x + 1, y - 1, tcolor);
+    }
   };
 
   const pawnMovement = (moves, x, y, limit) => {
@@ -216,120 +265,163 @@ function GameMovements() {
     pawnMovement(moves - 1, x - 1, y, limit);
   };
 
-  const rookMovement = (moves, x, y, direction) => {
+  const rookMovement = (moves, x, y, direction, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
 
     movements.push({ x: x, y: y });
-    if (direction === "n") rookMovement(moves - 1, x - 1, y, direction);
-    else if (direction === "s") rookMovement(moves - 1, x + 1, y, direction);
-    else if (direction === "w") rookMovement(moves - 1, x, y - 1, direction);
-    else if (direction === "e") rookMovement(moves - 1, x, y + 1, direction);
+    if (direction === "n") rookMovement(moves - 1, x - 1, y, direction, tcolor);
+    else if (direction === "s") rookMovement(moves - 1, x + 1, y, direction, tcolor);
+    else if (direction === "w") rookMovement(moves - 1, x, y - 1, direction, tcolor);
+    else if (direction === "e") rookMovement(moves - 1, x, y + 1, direction, tcolor);
   };
 
-  const knightMovement = (moves, x, y) => {
+  const knightMovement = (moves, x, y, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
 
     movements.push({ x: x, y: y });
-    knightMovement(moves - 1, x + 2, y + 1);
-    knightMovement(moves - 1, x + 2, y - 1);
-    knightMovement(moves - 1, x - 2, y + 1);
-    knightMovement(moves - 1, x - 2, y - 1);
-    knightMovement(moves - 1, x + 1, y + 2);
-    knightMovement(moves - 1, x + 1, y - 2);
-    knightMovement(moves - 1, x - 1, y + 2);
-    knightMovement(moves - 1, x - 1, y - 2);
+    knightMovement(moves - 1, x + 2, y + 1, tcolor);
+    knightMovement(moves - 1, x + 2, y - 1, tcolor);
+    knightMovement(moves - 1, x - 2, y + 1, tcolor);
+    knightMovement(moves - 1, x - 2, y - 1, tcolor);
+    knightMovement(moves - 1, x + 1, y + 2, tcolor);
+    knightMovement(moves - 1, x + 1, y - 2, tcolor);
+    knightMovement(moves - 1, x - 1, y + 2, tcolor);
+    knightMovement(moves - 1, x - 1, y - 2, tcolor);
   };
 
-  const bishopMovement = (moves, x, y, direction) => {
+  const bishopMovement = (moves, x, y, direction, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
 
     movements.push({ x: x, y: y });
-    if (direction === "ne") bishopMovement(moves - 1, x - 1, y + 1, direction);
+    if (direction === "ne") bishopMovement(moves - 1, x - 1, y + 1, direction, tcolor);
     else if (direction === "se")
-      bishopMovement(moves - 1, x + 1, y + 1, direction);
+      bishopMovement(moves - 1, x + 1, y + 1, direction, tcolor);
     else if (direction === "sw")
-      bishopMovement(moves - 1, x + 1, y - 1, direction);
+      bishopMovement(moves - 1, x + 1, y - 1, direction, tcolor);
     else if (direction === "nw")
-      bishopMovement(moves - 1, x - 1, y - 1, direction);
+      bishopMovement(moves - 1, x - 1, y - 1, direction, tcolor);
   };
-  const queenMovement = (moves, x, y, direction) => {
+  const queenMovement = (moves, x, y, direction, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
 
     movements.push({ x: x, y: y });
-    if (direction === "n") queenMovement(moves - 1, x - 1, y, direction);
-    else if (direction === "e") queenMovement(moves - 1, x, y + 1, direction);
-    else if (direction === "s") queenMovement(moves - 1, x + 1, y, direction);
-    else if (direction === "w") queenMovement(moves - 1, x, y - 1, direction);
+    if (direction === "n") queenMovement(moves - 1, x - 1, y, direction, tcolor);
+    else if (direction === "e") queenMovement(moves - 1, x, y + 1, direction, tcolor);
+    else if (direction === "s") queenMovement(moves - 1, x + 1, y, direction, tcolor);
+    else if (direction === "w") queenMovement(moves - 1, x, y - 1, direction, tcolor);
     else if (direction === "ne")
-      queenMovement(moves - 1, x - 1, y + 1, direction);
+      queenMovement(moves - 1, x - 1, y + 1, direction, tcolor);
     else if (direction === "se")
-      queenMovement(moves - 1, x + 1, y + 1, direction);
+      queenMovement(moves - 1, x + 1, y + 1, direction, tcolor);
     else if (direction === "sw")
-      queenMovement(moves - 1, x + 1, y - 1, direction);
+      queenMovement(moves - 1, x + 1, y - 1, direction, tcolor);
     else if (direction === "nw")
-      queenMovement(moves - 1, x - 1, y - 1, direction);
+      queenMovement(moves - 1, x - 1, y - 1, direction, tcolor);
   };
-  const kingMovement = (moves, x, y) => {
+  const kingMovement = (moves, x, y, tcolor) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
     if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== color) {
+      if (piecePosition[x][y].piece[0] !== tcolor) {
         movements.push({ x: x, y: y });
       }
       return;
     }
 
     movements.push({ x: x, y: y });
-    kingMovement(moves - 1, x - 1, y);
-    kingMovement(moves - 1, x, y + 1);
-    kingMovement(moves - 1, x + 1, y);
-    kingMovement(moves - 1, x, y - 1);
+    kingMovement(moves - 1, x - 1, y, tcolor);
+    kingMovement(moves - 1, x, y + 1, tcolor);
+    kingMovement(moves - 1, x + 1, y, tcolor);
+    kingMovement(moves - 1, x, y - 1, tcolor);
 
-    kingMovement(moves - 1, x - 1, y + 1);
-    kingMovement(moves - 1, x + 1, y + 1);
-    kingMovement(moves - 1, x + 1, y - 1);
-    kingMovement(moves - 1, x - 1, y - 1);
+    kingMovement(moves - 1, x - 1, y + 1, tcolor);
+    kingMovement(moves - 1, x + 1, y + 1, tcolor);
+    kingMovement(moves - 1, x + 1, y - 1, tcolor);
+    kingMovement(moves - 1, x - 1, y - 1, tcolor);
+  };
+
+  const movementsGenerator = (piece, x, y, tcolor) => {
+    // console.log(tcolor, color);
+    if (piece === "pawn") {
+      if(tcolor !== color){
+        if (x === 1) {
+          pawnMovement(2, x, y, 2);
+        } else {
+          pawnMovement(1, x, y, 1);
+        }
+      }else{
+        if (x === 6) {
+          pawnMovement(2, x, y, 2);
+        } else {
+          pawnMovement(1, x, y, 1);
+        }
+      }
+      pawnKillingMovement(1, x, y, tcolor);
+    } else if (piece === "rook") {
+      rookMovement(1000, x, y, "n", tcolor);
+      rookMovement(1000, x, y, "s", tcolor);
+      rookMovement(1000, x, y, "w", tcolor);
+      rookMovement(1000, x, y, "e", tcolor);
+    } else if (piece === "knight") {
+      knightMovement(1, x, y, tcolor);
+    } else if (piece === "bishop") {
+      bishopMovement(1000, x, y, "ne", tcolor);
+      bishopMovement(1000, x, y, "se", tcolor);
+      bishopMovement(1000, x, y, "sw", tcolor);
+      bishopMovement(1000, x, y, "nw", tcolor);
+    } else if (piece === "queen") {
+      queenMovement(1000, x, y, "n", tcolor);
+      queenMovement(1000, x, y, "e", tcolor);
+      queenMovement(1000, x, y, "s", tcolor);
+      queenMovement(1000, x, y, "w", tcolor);
+
+      queenMovement(1000, x, y, "ne", tcolor);
+      queenMovement(1000, x, y, "se", tcolor);
+      queenMovement(1000, x, y, "sw", tcolor);
+      queenMovement(1000, x, y, "nw", tcolor);
+    } else if (piece === "king") {
+      kingMovement(1, x, y, tcolor);
+    }
   };
 
   const calculateMovements = (id, piece) => {
     let x = -1,
       y = -1;
-    while (movements.length > 0) {
-      movements.pop();
-    }
+
+    clearMovementsArray();
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (piecePosition[i][j].id === id) {
@@ -340,40 +432,7 @@ function GameMovements() {
       }
     }
 
-    // console.log(id, piece);
-    // console.log(x, y);
-    if (piece === "pawn") {
-      if (x === 6) {
-        pawnMovement(2, x, y, 2);
-      } else {
-        pawnMovement(1, x, y, 1);
-      }
-      pawnKillingMovement(1, x, y);
-    } else if (piece === "rook") {
-      rookMovement(1000, x, y, "n");
-      rookMovement(1000, x, y, "s");
-      rookMovement(1000, x, y, "w");
-      rookMovement(1000, x, y, "e");
-    } else if (piece === "knight") {
-      knightMovement(1, x, y);
-    } else if (piece === "bishop") {
-      bishopMovement(1000, x, y, "ne");
-      bishopMovement(1000, x, y, "se");
-      bishopMovement(1000, x, y, "sw");
-      bishopMovement(1000, x, y, "nw");
-    } else if (piece === "queen") {
-      queenMovement(1000, x, y, "n");
-      queenMovement(1000, x, y, "e");
-      queenMovement(1000, x, y, "s");
-      queenMovement(1000, x, y, "w");
-
-      queenMovement(1000, x, y, "ne");
-      queenMovement(1000, x, y, "se");
-      queenMovement(1000, x, y, "sw");
-      queenMovement(1000, x, y, "nw");
-    } else if (piece === "king") {
-      kingMovement(1, x, y);
-    }
+    movementsGenerator(piece, x, y, color);
     selectPositions();
   };
 
@@ -387,6 +446,7 @@ function GameMovements() {
         setColor={setColor}
         selectedPosition={selectedPosition}
         setSelectedPosition={setSelectedPosition}
+        kingChecker={kingChecker}
       />
     </Container>
   );
