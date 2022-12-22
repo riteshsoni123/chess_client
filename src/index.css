@@ -1,0 +1,22 @@
+.square {
+  height: 80px;
+  width: 80px;
+}
+.black {
+  background-color: #7d945d;
+}
+.swhite {
+  background-color: #eeeed5;
+}
+
+.black-selected {
+  background-color: #d74840;
+}
+.white-selected {
+  background-color: #e2514c;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
