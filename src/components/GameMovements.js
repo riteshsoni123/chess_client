@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Container from "react-bootstrap/Container";
+import React, { useState } from "react";
 import GameLogic from "./GameLogic";
 
 function GameMovements() {
@@ -176,49 +175,49 @@ function GameMovements() {
   //   console.log(selectedPosition);
   // }, [selectedPosition]);
 
-  const clearMovementsArray = () =>{
+  const clearMovementsArray = () => {
     while (movements.length > 0) {
       movements.pop();
     }
-  }
-
+  };
 
   const kingChecker = () => {
-    console.log("hi")
+    console.log("hi");
 
-    let r=-1,c=-1;
-    for(let i=0;i<8;i++){
-      for(let j=0;j<8;j++){
-        if(piecePosition[i][j].piece===`${color}_king`){
-          r=i;c=j;
+    let r = -1,
+      c = -1;
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (piecePosition[i][j].piece === `${color}_king`) {
+          r = i;
+          c = j;
           break;
         }
       }
-      if(r!==-1&&c!==-1){
+      if (r !== -1 && c !== -1) {
         break;
       }
     }
 
-    console.log(r,c)
-    
-    for(let i=0;i<8;i++){
-      for(let j=0;j<8;j++){
+    console.log(r, c);
+
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
         const piece = piecePosition[i][j].piece;
-        if(piece[0]!==color){
+        if (piece[0] !== color) {
           clearMovementsArray();
-          movementsGenerator(piece.substring(2, piece.length),i, j, piece[0]);
+          movementsGenerator(piece.substring(2, piece.length), i, j, piece[0]);
         }
-        for(let k=0;k<movements.length;k++){
-          const {x,y} = movements[k];
-          if(x===r&&y===c){
-            console.log("bazinga")
+        for (let k = 0; k < movements.length; k++) {
+          const { x, y } = movements[k];
+          if (x === r && y === c) {
+            console.log("bazinga");
             return false;
           }
         }
       }
     }
     return true;
-
   };
 
   const selectPositions = () => {
@@ -245,10 +244,10 @@ function GameMovements() {
       }
       return;
     }
-    if(tcolor===color){
+    if (tcolor === color) {
       pawnKillingMovement(moves - 1, x - 1, y + 1, tcolor);
       pawnKillingMovement(moves - 1, x - 1, y - 1, tcolor);
-    }else{
+    } else {
       pawnKillingMovement(moves - 1, x + 1, y + 1, tcolor);
       pawnKillingMovement(moves - 1, x + 1, y - 1, tcolor);
     }
@@ -278,9 +277,12 @@ function GameMovements() {
 
     movements.push({ x: x, y: y });
     if (direction === "n") rookMovement(moves - 1, x - 1, y, direction, tcolor);
-    else if (direction === "s") rookMovement(moves - 1, x + 1, y, direction, tcolor);
-    else if (direction === "w") rookMovement(moves - 1, x, y - 1, direction, tcolor);
-    else if (direction === "e") rookMovement(moves - 1, x, y + 1, direction, tcolor);
+    else if (direction === "s")
+      rookMovement(moves - 1, x + 1, y, direction, tcolor);
+    else if (direction === "w")
+      rookMovement(moves - 1, x, y - 1, direction, tcolor);
+    else if (direction === "e")
+      rookMovement(moves - 1, x, y + 1, direction, tcolor);
   };
 
   const knightMovement = (moves, x, y, tcolor) => {
@@ -317,7 +319,8 @@ function GameMovements() {
     }
 
     movements.push({ x: x, y: y });
-    if (direction === "ne") bishopMovement(moves - 1, x - 1, y + 1, direction, tcolor);
+    if (direction === "ne")
+      bishopMovement(moves - 1, x - 1, y + 1, direction, tcolor);
     else if (direction === "se")
       bishopMovement(moves - 1, x + 1, y + 1, direction, tcolor);
     else if (direction === "sw")
@@ -337,10 +340,14 @@ function GameMovements() {
     }
 
     movements.push({ x: x, y: y });
-    if (direction === "n") queenMovement(moves - 1, x - 1, y, direction, tcolor);
-    else if (direction === "e") queenMovement(moves - 1, x, y + 1, direction, tcolor);
-    else if (direction === "s") queenMovement(moves - 1, x + 1, y, direction, tcolor);
-    else if (direction === "w") queenMovement(moves - 1, x, y - 1, direction, tcolor);
+    if (direction === "n")
+      queenMovement(moves - 1, x - 1, y, direction, tcolor);
+    else if (direction === "e")
+      queenMovement(moves - 1, x, y + 1, direction, tcolor);
+    else if (direction === "s")
+      queenMovement(moves - 1, x + 1, y, direction, tcolor);
+    else if (direction === "w")
+      queenMovement(moves - 1, x, y - 1, direction, tcolor);
     else if (direction === "ne")
       queenMovement(moves - 1, x - 1, y + 1, direction, tcolor);
     else if (direction === "se")
@@ -376,13 +383,13 @@ function GameMovements() {
   const movementsGenerator = (piece, x, y, tcolor) => {
     // console.log(tcolor, color);
     if (piece === "pawn") {
-      if(tcolor !== color){
+      if (tcolor !== color) {
         if (x === 1) {
           pawnMovement(2, x, y, 2);
         } else {
           pawnMovement(1, x, y, 1);
         }
-      }else{
+      } else {
         if (x === 6) {
           pawnMovement(2, x, y, 2);
         } else {
@@ -437,7 +444,7 @@ function GameMovements() {
   };
 
   return (
-    <Container>
+    <div className="container mx-auto">
       <GameLogic
         piecePosition={piecePosition}
         setPiecePosition={setPiecePosition}
@@ -448,7 +455,7 @@ function GameMovements() {
         setSelectedPosition={setSelectedPosition}
         kingChecker={kingChecker}
       />
-    </Container>
+    </div>
   );
 }
 

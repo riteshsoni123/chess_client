@@ -1,12 +1,11 @@
 import React from "react";
 import "../index.css";
-import Container from "react-bootstrap/Container";
 
 function Game(props) {
   const { positionClicked, piecePosition } = props;
 
   return (
-    <Container>
+    <div className="container mx-auto">
       {piecePosition.map((row, i) => {
         return (
           <div key={i} className="center">
@@ -37,7 +36,7 @@ function Game(props) {
           </div>
         );
       })}
-    </Container>
+    </div>
   );
 }
 
