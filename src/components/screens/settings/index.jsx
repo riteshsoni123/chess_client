@@ -90,7 +90,7 @@ function Settings() {
   };
 
   return (
-    <div className="container mx-auto w-1/2">
+    <div className="container mx-auto w-2/5">
       <div className="bg-[#D9D9D9] flex items-center justify-around h-96 rounded-b-lg mb-10">
         <div className="w-1/4 border-2 border-white rounded-lg">
           <img className="rounded-lg" src={unknown} alt="" />
