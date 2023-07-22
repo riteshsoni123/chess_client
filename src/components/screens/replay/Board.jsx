@@ -49,8 +49,8 @@ function Board(props) {
         <div className="rounded-t-lg flex justify-center bg-[#727272]">
           Moves
         </div>
-        <div>
-          <div>
+        <div className="relative">
+          <div className="w-1/1 overflow-y-scroll h-[590px]">
             {moves_notation.map((move) => {
               return (
                 <div
@@ -84,9 +84,16 @@ function Board(props) {
               );
             })}
           </div>
-          <div className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:cursor-pointer">
-            <div onClick={() => reduce_moves_index()}>Backword</div>
-            <div onClick={() => increase_moves_index()}>Forward</div>
+          <div className="absolute bottom--1 left-0 right-0 rounded-t-lg border-t-2 border-black">
+            <div className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:cursor-pointer">
+              <div
+                className="border-r-2 border-black"
+                onClick={() => reduce_moves_index()}
+              >
+                Backword
+              </div>
+              <div onClick={() => increase_moves_index()}>Forward</div>
+            </div>
           </div>
         </div>
       </div>
