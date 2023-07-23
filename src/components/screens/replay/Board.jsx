@@ -50,14 +50,16 @@ function Board(props) {
           Moves
         </div>
         <div className="relative">
-          <div className="w-1/1 overflow-y-scroll h-[590px]">
+          <div className="w-1/1 overflow-y-scroll no-scrollbar h-[590px]">
             {moves_notation.map((move) => {
               return (
                 <div
                   key={move.id}
                   className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center"
                 >
-                  <span className="px-1 bg-[#C0C0C0]">{move.id + 1}.</span>
+                  <span className="px-1 bg-[#C0C0C0] w-[30px]">
+                    {move.id + 1}.
+                  </span>
                   <div
                     className={
                       mIndex === move.id * 2

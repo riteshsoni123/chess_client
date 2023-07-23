@@ -10,12 +10,12 @@ function App() {
   return (
     <div>
       <Routes>
-        {/* <Route exact path="/" element={<GameMovements />} /> */}
+        <Route exact path="/" element={<GameMovements />} />
         <Route exact path="/signin" element={<Login />} />
         <Route exact path="/signup" element={<Signup />} />
         <Route exact path="/settings" element={<Settings />} />
         <Route exact path="/analyze" element={<Analyze />} />
-        <Route exact path="/" element={<Replay />} />
+        <Route exact path="/replay" element={<Replay />} />
       </Routes>
     </div>
   );

@@ -148,13 +148,6 @@ function Position(props) {
         increase_moves_index={increase_moves_index}
         reduce_moves_index={reduce_moves_index}
       />
-      {/* <Board
-        mIndex={mIndex}
-        piecePosition={piecePosition}
-        moves_notation={moves_notation}
-        increase_moves_index={increase_moves_index}
-        reduce_moves_index={reduce_moves_index}
-      /> */}
     </div>
   );
 }
