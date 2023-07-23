@@ -17,6 +17,10 @@
   }
 }
 
+body {
+  background-color: #5f6368;
+}
+
 .square {
   height: 80px;
   width: 80px;
@@ -24,7 +28,7 @@
 .black {
   background-color: #7d945d;
 }
-.swhite {
+.white {
   background-color: #eeeed5;
 }
 

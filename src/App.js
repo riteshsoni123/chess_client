@@ -5,10 +5,12 @@ import Login from "./components/screens/signin";
 import Signup from "./components/screens/signup";
 import Analyze from "./components/screens/analyze";
 import Replay from "./components/screens/replay";
+import Sidebar from "./components/screens/sidebar";
 
 function App() {
   return (
-    <div>
+    <div className="flex flex-row h-screen w-screen">
+      <Sidebar />
       <Routes>
         <Route exact path="/" element={<GameMovements />} />
         <Route exact path="/signin" element={<Login />} />
