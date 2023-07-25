@@ -549,7 +549,7 @@ function Replay() {
   }, []);
 
   return (
-    <div>
+    <div className="container mx-auto">
       <Position moves_index={moves_index} />
     </div>
   );

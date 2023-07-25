@@ -9,7 +9,7 @@ import Sidebar from "./components/screens/sidebar";
 
 function App() {
   return (
-    <div className="flex flex-row h-screen w-screen">
+    <div className="flex flex-row">
       <Sidebar />
       <Routes>
         <Route exact path="/" element={<GameMovements />} />

@@ -140,7 +140,7 @@ function Position(props) {
   }, [mIndex]);
 
   return (
-    <div>
+    <div className="container mx-auto">
       <Board
         mIndex={mIndex}
         piecePosition={piecePosition}

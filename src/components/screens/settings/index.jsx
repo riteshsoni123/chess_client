@@ -90,8 +90,8 @@ function Settings() {
   };
 
   return (
-    <div className="container mx-auto w-2/5">
-      <div className="bg-[#D9D9D9] flex items-center justify-around h-96 rounded-b-lg mb-10">
+    <div className="container mx-auto w-2/5 [&>div]:bg-[#BABCBE] [&>div]:shadow-2xl">
+      <div className="flex items-center justify-around h-96 rounded-b-lg mb-10">
         <div className="w-1/4 border-2 border-white rounded-lg">
           <img className="rounded-lg" src={unknown} alt="" />
         </div>
@@ -110,9 +110,13 @@ function Settings() {
           </div>
         </div>
       </div>
-      <div className="rounded-t-lg bg-[#D9D9D9]">
-        <h1 className="pl-5 pt-5 font-bold text-3xl">Basic Info</h1>
-        <div className="[&>div]:mt-2 [&>div]:flex [&>div]:justify-between [&>div]:border-b [&>div]:p-2 [&>div>p]:text-blue-600 [&>div>p]:cursor-pointer [&>div>p]:text-right">
+      <div className="rounded-t-lg">
+        <div className="bg-[#727272] rounded-t-lg flex justify-center items-center">
+          <h1 className="my-3 text-white font-bold text-3xl flex items-center justify-center">
+            Basic Info
+          </h1>
+        </div>
+        <div className="[&>div]:mt-2 [&>div]:flex [&>div]:justify-between [&>div]:border-b-[1px] [&>div]:border-black [&>div]:p-2 [&>div>p]:text-blue-600 [&>div>p]:cursor-pointer [&>div>p]:text-right">
           {basic_info.map((element) => {
             return key === element ? (
               <div key={element}>

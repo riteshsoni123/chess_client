@@ -107,9 +107,9 @@ function Analyze() {
   ];
 
   return (
-    <div className="container mx-auto w-2/5">
-      <div className="bg-[#D9D9D9] flex items-center justify-around h-96 rounded-b-lg mb-10">
-        <div className="w-1/4 border-2 border-white rounded-lg">
+    <div className="container mx-auto w-2/5 [&>div]:shadow-2xl [&>div]:bg-[#BABCBE]">
+      <div className=" flex items-center justify-around h-96 rounded-b-lg mb-10">
+        <div className="w-1/4 border-[1px] border-white shadow-xl rounded-lg">
           <img className="rounded-lg" src={unknown} alt="" />
         </div>
         <div className="w-2/4 [&>div]:mt-5">
@@ -127,9 +127,9 @@ function Analyze() {
           </div>
         </div>
       </div>
-      <div className="rounded-lg bg-[#D9D9D9] [&>div]:flex [&>div]:flex-col [&>div]:items-center [&>div>h1]:text-3xl mb-10">
+      <div className="rounded-xl [&>div]:flex [&>div]:flex-col [&>div]:items-center [&>div>h1]:text-3xl mb-10 [&>div>h1]:w-full [&>div>h1]:flex [&>div>h1]:justify-center [&>div>h1]:items-start [&>div>h1]:rounded-t-xl [&>div>h1]:bg-[#727272] [&>div>h1]:text-white">
         <div>
-          <h1>Overall Stats</h1>
+          <h1 className="">Overall Stats</h1>
           <PieChart data={overall_data} />
         </div>
         <div>
@@ -141,7 +141,7 @@ function Analyze() {
           <PieChart data={black_data} />
         </div>
       </div>
-      <div className="rounded-t-lg bg-[#D9D9D9] [&>div]:flex [&>div]:justify-between">
+      <div className="rounded-t-lg [&>div]:flex [&>div]:justify-between">
         <p className="bg-[#727272] h-10 rounded-t-lg text-2xl text-white flex justify-center items-center">
           Completed Games
         </p>
@@ -155,7 +155,7 @@ function Analyze() {
           return (
             <div
               key={game.key}
-              className="[&>div]:flex [&>div]:flex-col [&>div]:items-center border-2 p-2"
+              className="[&>div]:flex [&>div]:flex-col [&>div]:items-center border-b-[1px] border-black p-2"
             >
               <div className="w-2/6">
                 <div>riteshsoni123</div>

@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 function Sidebar() {
   return (
     <>
-      <div className="fixed bg-[#4D4D4D] h-screen w-48">
+      <div className="fixed bg-[#4D4D4D] h-screen w-48 shadow-2xl">
         <div className="absolute [&>div]:border-b-[1px] [&>div]:border-white">
           <Link
-            className="border-b-[1px] border-white w-48 h-16 flex justify-center items-center cursor-pointer text-white text-lg"
+            className="font-irish border-b-[1px] border-white w-48 h-16 flex justify-center items-center cursor-pointer text-white text-5xl"
             to="/"
           >
             Chess

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Irish+Grover&display=swap");
 
 @layer utilities {
   @variants responsive {
@@ -19,6 +20,9 @@
 
 body {
   background-color: #5f6368;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
 }
 
 .square {
@@ -26,10 +30,10 @@ body {
   width: 80px;
 }
 .black {
-  background-color: #7d945d;
+  background-color: #535353;
 }
 .white {
-  background-color: #eeeed5;
+  background-color: #dee1e6;
 }
 
 .black-selected {

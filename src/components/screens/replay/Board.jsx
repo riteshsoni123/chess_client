@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "../../../index.css";
 
 function Board(props) {
+  const [opponent, setOpponent] = useState("unknown");
+  const username = "riteshsoni123";
   const {
     mIndex,
     piecePosition,
@@ -11,8 +13,12 @@ function Board(props) {
   } = props;
 
   return (
-    <div className="border-2 container mx-auto flex flex-row justify-center w-2/3 mt-10">
-      <div className="border-2 w-8/10">
+    <div className="container m-auto flex flex-row justify-center items-center w-2/3 mt-10 [&>div]:shadow-xl">
+      <div className="w-8/10">
+        <div className="bg-[#494F55] rounded-t-md h-[40px] text-xl text-[#BABCBE] flex items-center justify-between px-3">
+          <div>{opponent}</div>
+          <div>5:00</div>
+        </div>
         {piecePosition.map((row, i) => {
           return (
             <div key={i} className="center">
@@ -44,22 +50,24 @@ function Board(props) {
             </div>
           );
         })}
+        <div className="bg-[#494F55] rounded-b-md h-10 text-xl text-[#BABCBE] flex items-center justify-between px-3">
+          <div>{username}</div>
+          <div>5:00</div>
+        </div>
       </div>
-      <div className="w-3/12 ml-5 rounded-t-lg border-[1px] border-black bg-[#E5E4E2]">
-        <div className="rounded-t-lg flex justify-center bg-[#727272]">
+      <div className="w-3/12 ml-10 h-[720px] rounded-lg bg-[#BABCBE] flex-1">
+        <div className="bg-[#494F55] text-xl text-[#BABCBE] rounded-t-lg h-10 flex justify-center items-center">
           Moves
         </div>
-        <div className="relative">
-          <div className="w-1/1 overflow-y-scroll no-scrollbar h-[590px]">
+        <div className="h-[640px]">
+          <div className="w-1/1 overflow-y-scroll no-scrollbar h-full">
             {moves_notation.map((move) => {
               return (
                 <div
                   key={move.id}
                   className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center"
                 >
-                  <span className="px-1 bg-[#C0C0C0] w-[30px]">
-                    {move.id + 1}.
-                  </span>
+                  <span className="px-1 bg-[#C0C0C0] w-[30px]">{move.id}.</span>
                   <div
                     className={
                       mIndex === move.id * 2
@@ -86,16 +94,16 @@ function Board(props) {
               );
             })}
           </div>
-          <div className="absolute bottom--1 left-0 right-0 rounded-t-lg border-t-2 border-black">
-            <div className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:cursor-pointer">
-              <div
-                className="border-r-2 border-black"
-                onClick={() => reduce_moves_index()}
-              >
-                Backword
-              </div>
-              <div onClick={() => increase_moves_index()}>Forward</div>
+        </div>
+        <div className="h-[40px] border-t-[1px] border-black">
+          <div className="flex flex-row h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer">
+            <div
+              className="border-r-[1px] border-black"
+              onClick={() => reduce_moves_index()}
+            >
+              Backword
             </div>
+            <div onClick={() => increase_moves_index()}>Forward</div>
           </div>
         </div>
       </div>
