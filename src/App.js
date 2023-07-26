@@ -1,4 +1,4 @@
-import GameLogic from "./components/GameLogic";
+// import GameLogic from "./components/GameLogic";
 import GameMovements from "./components/GameMovements";
 
 function App() {
