@@ -95,15 +95,14 @@ function Board(props) {
             })}
           </div>
         </div>
-        <div className="h-[40px] border-t-[1px] border-black">
-          <div className="flex flex-row h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer">
-            <div
-              className="border-r-[1px] border-black"
-              onClick={() => reduce_moves_index()}
-            >
-              Backword
+        <div className="rounded-b-lg h-[40px] bg-[#5f6368]">
+          <div className="flex flex-row h-full [&>div>button]:rounded-b-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-b-lg ">
+            <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button onClick={() => reduce_moves_index()}>Backward</button>
             </div>
-            <div onClick={() => increase_moves_index()}>Forward</div>
+            <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button onClick={() => increase_moves_index()}>Forward</button>
+            </div>
           </div>
         </div>
       </div>

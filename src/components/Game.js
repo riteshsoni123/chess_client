@@ -187,16 +187,24 @@ function Game(props) {
             })}
           </div>
         </div>
-        <div className="rounded-t-lg h-[30px] border-t-[1px] border-black">
-          <div className="flex flex-row h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer">
-            <div className="border-r-[1px] border-black">Backword</div>
-            <div>Forward</div>
+        <div className="rounded-t-lg h-[30px] mb-[1px]">
+          <div className="flex flex-row h-full [&>div>button]:rounded-t-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-t-lg ">
+            <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button>Backward</button>
+            </div>
+            <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button>Forward</button>
+            </div>
           </div>
         </div>
-        <div className="border-y-[1px] h-[30px] border-black">
-          <div className="flex flex-row h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer">
-            <div className="border-r-[1px] border-black">Draw</div>
-            <div>Resign</div>
+        <div className="rounded-b-lg h-[30px]">
+          <div className="flex flex-row h-full [&>div>button]:rounded-b-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-b-lg ">
+            <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button>Draw</button>
+            </div>
+            <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+              <button>Resign</button>
+            </div>
           </div>
         </div>
         <div className="h-[190px]">
@@ -217,6 +225,23 @@ function Game(props) {
           />
         </div>
       </div>
+
+      {/* <div className="w-3/12 ml-10 h-[200px] rounded-lg bg-[#BABCBE] flex-1 flex flex-col justify-between items-center ">
+        <div className="text-xl w-full h-10 flex items-center justify-center rounded-t-lg bg-[#494F55] text-[#BABCBE]">
+          Create Challange
+        </div>
+        <div>
+          <input
+            placeholder="Enter opponent's username"
+            className="rounded-md h-8 px-2"
+          />
+        </div>
+        <div className="w-full flex justify-center mb-5">
+          <button className="py-1 rounded-md w-1/2 bg-[#494F55] hover:bg-[#535353] text-[#BABCBE]">
+            Create
+          </button>
+        </div>
+      </div> */}
     </div>
   );
 }

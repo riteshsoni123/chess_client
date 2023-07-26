@@ -17,8 +17,8 @@ export default function Login() {
   };
 
   return (
-    <div className="bg-gray-50 flex items-center justify-center w-screen">
-      <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5 justify-center items-center">
+    <div className="bg-[#5f6368] flex items-center justify-center w-screen h-screen">
+      <div className="bg-[#BABCBE] flex rounded-2xl shadow-lg max-w-3xl p-5 justify-center items-center">
         <div className="md:w-1/2 p-16">
           <h2 className="font-bold text-2xl">Login</h2>
           <p className="text-sm mt-4">If you already a member, easily login</p>
@@ -54,10 +54,10 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-10 grid grid-cols-3 items-center text-gray-400">
-            <hr className="border-gray-400" />
+          <div className="mt-10 grid grid-cols-3 items-center text-black">
+            <hr className="border-black" />
             <p className="text-center text-sm">OR</p>
-            <hr className="border-gray-400" />
+            <hr className="border-black" />
           </div>
 
           <button
@@ -72,7 +72,7 @@ export default function Login() {
             <p className="mb-4 text-xs hover:text-blue-400 hover:cursor-pointer inline-block">
               Forgot your password?
             </p>
-            <hr className="border-b" />
+            <hr className="border-black" />
           </div>
 
           <div className="mt-3 text-xs flex justify-between items-center">
