@@ -26,7 +26,10 @@ function Game(props) {
                     }
                   >
                     {square.piece ? (
-                      <img src={require(`../pieceImg/${square.piece}.png`)} />
+                      <img
+                        src={require(`../pieceImg/${square.piece}.png`)}
+                        alt={square.piece}
+                      />
                     ) : (
                       ""
                     )}
