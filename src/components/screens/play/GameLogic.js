@@ -11,6 +11,8 @@ function GameLogic(props) {
     selectedPosition,
     setSelectedPosition,
     kingChecker,
+    username,
+    setUsername,
   } = props;
 
   const clearSelection = () => {
@@ -89,7 +91,12 @@ function GameLogic(props) {
   };
   return (
     <div className="container mx-auto">
-      <Game piecePosition={piecePosition} positionClicked={positionClicked} />
+      <Game
+        piecePosition={piecePosition}
+        positionClicked={positionClicked}
+        username={username}
+        setUsername={setUsername}
+      />
     </div>
   );
 }

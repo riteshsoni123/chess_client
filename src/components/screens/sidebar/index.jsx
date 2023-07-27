@@ -1,7 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const signOut = () => {
+    localStorage.removeItem("authToken");
+    navigate("/signup");
+  };
+
   return (
     <>
       <div className="fixed bg-[#4D4D4D] h-screen w-48 shadow-2xl">
@@ -38,18 +44,18 @@ function Sidebar() {
           </Link>
         </div>
         <div className="absolute bottom-0 [&>div]:border-t-[1px] [&>div]:border-white">
-          <Link
+          <div
             className="border-t-[1px] border-white w-48 h-16 flex justify-center items-center cursor-pointer text-white text-lg"
             to="/"
           >
             Dark Theme
-          </Link>
-          <Link
+          </div>
+          <div
             className="border-t-[1px] border-white w-48 h-16 flex justify-center items-center cursor-pointer text-white text-lg"
-            to="/signup"
+            onClick={signOut}
           >
             Sign Out
-          </Link>
+          </div>
         </div>
       </div>
     </>
