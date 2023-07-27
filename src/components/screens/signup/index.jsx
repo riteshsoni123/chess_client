@@ -1,9 +1,66 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "../../../axios";
+import { Link, useNavigate } from "react-router-dom";
 import google_image from "../../../google.svg";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // const [confirmPassword, setConfirmpassword] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("authToken")) {
+      console.log(localStorage.getItem("authToken"));
+      navigate("/");
+    }
+  }, [navigate]);
+
+  const registerHandler = async (e) => {
+    // console.log(process.env.REACT_APP_BACKEND_URL);
+    e.preventDefault();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    // if (password !== confirmPassword) {
+    //   setPassword("");
+    //   setConfirmpassword("");
+    //   setTimeout(() => {
+    //     setError("");
+    //   }, 5000);
+    //   return setError("Passwords do not match");
+    // }
+
+    let username = "";
+
+    for (let i = 0; i < email.length; i++) {
+      if (email[i] === "@") break;
+      username += email[i];
+    }
+
+    console.log(username, email, password);
+
+    try {
+      const { data } = await axios.post(
+        "/api/auth/register",
+        { username, email, password },
+        config
+      );
+      localStorage.setItem("authToken", data.token);
+      navigate("/");
+    } catch (error) {
+      setError(error.response.data.error);
+      setTimeout(() => {
+        setError("");
+      }, 5000);
+    }
+  };
 
   const showPasswordButton = () => {
     setShowPassword(!showPassword);
@@ -22,11 +79,13 @@ export default function Signup() {
         <div className="md:w-1/2 p-16">
           <h2 className="font-bold text-2xl">Signup</h2>
           <p className="text-sm mt-4">If you already a member, easily login</p>
-          <form action="" className="flex flex-col gap-4">
+          <form onSubmit={registerHandler} className="flex flex-col gap-4">
             <input
               className="p-2 mt-8 rounded-xl border"
               type="text"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
             />
             <div className="relative">
@@ -34,6 +93,8 @@ export default function Signup() {
                 className="p-2 rounded-xl border w-full"
                 type={showPassword ? "text" : "password"}
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
               />
               <svg
@@ -49,7 +110,10 @@ export default function Signup() {
                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
               </svg>
             </div>
-            <button className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300">
+            <button
+              type="submit"
+              className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300"
+            >
               Signup
             </button>
           </form>

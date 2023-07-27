@@ -1,9 +1,20 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "../../../axios";
 import google_image from "../../../google.svg";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("authToken")) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const showPasswordButton = () => {
     setShowPassword(!showPassword);
@@ -16,17 +27,47 @@ export default function Login() {
     // );
   };
 
+  const loginHandler = async (e) => {
+    e.preventDefault();
+
+    const config = {
+      header: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const { data } = await axios.post(
+        "/api/auth/login",
+        { email, password },
+        config
+      );
+
+      localStorage.setItem("authToken", data.token);
+
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      setError(error.response.data.error);
+      setTimeout(() => {
+        setError("");
+      }, 5000);
+    }
+  };
+
   return (
     <div className="bg-[#5f6368] flex items-center justify-center w-screen h-screen">
       <div className="bg-[#BABCBE] flex rounded-2xl shadow-lg max-w-3xl p-5 justify-center items-center">
         <div className="md:w-1/2 p-16">
           <h2 className="font-bold text-2xl">Login</h2>
           <p className="text-sm mt-4">If you already a member, easily login</p>
-          <form action="" className="flex flex-col gap-4">
+          <form onSubmit={loginHandler} className="flex flex-col gap-4">
             <input
               className="p-2 mt-8 rounded-xl border"
               type="text"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
             />
             <div className="relative">
@@ -34,6 +75,8 @@ export default function Login() {
                 className="p-2 rounded-xl border w-full"
                 type={showPassword ? "text" : "password"}
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
               />
               <svg
@@ -49,7 +92,10 @@ export default function Login() {
                 <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
               </svg>
             </div>
-            <button className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300">
+            <button
+              type="submit"
+              className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300"
+            >
               Login
             </button>
           </form>
