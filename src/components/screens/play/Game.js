@@ -13,6 +13,7 @@ function Game(props) {
   const [sudoOpponent, setSudoOpponent] = useState("");
   const [sudoChallanger, setSudoChallanger] = useState("");
   const [message, setMessage] = useState("");
+  const [challangeDecliner, setChallangeDecliner] = useState("");
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
@@ -87,6 +88,16 @@ function Game(props) {
     return () => socket.off("recieveMessage");
   });
 
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("declineChallange", (data) => {
+      console.log("challange declined by: ", data);
+      setChallangeDecliner(data);
+    });
+    return () => socket.off("declineChallange");
+  });
+
   const sendChallange = () => {
     socket.emit("sendChallange", { id: sudoOpponent, sender: username });
   };
@@ -94,6 +105,10 @@ function Game(props) {
   const acceptChallange = () => {
     socket.emit("acceptChallange", { id: sudoChallanger, sender: username });
     setOpponent(sudoChallanger);
+  };
+  const declineChallange = () => {
+    socket.emit("declineChallange", { id: sudoChallanger, sender: username });
+    setSudoChallanger("");
   };
 
   const sendMessage = (e) => {
@@ -174,6 +189,11 @@ function Game(props) {
                 }}
               />
             </div>
+            <div className="text-sm text-red-500">
+              {challangeDecliner === ""
+                ? ""
+                : `Challange declined by: ${challangeDecliner}`}
+            </div>
             <div className="w-full flex justify-center mb-5">
               <button
                 className="py-1 rounded-md w-1/2 bg-[#494F55] hover:bg-[#535353] text-[#BABCBE]"
@@ -184,13 +204,24 @@ function Game(props) {
             </div>
           </div>
         ) : (
-          <div className="w-3/12 ml-10 h-[200px] rounded-lg bg-[#BABCBE] flex-1 flex flex-col justify-between items-center ">
-            <div className="text-xl w-full h-10 flex items-center justify-center rounded-t-lg bg-[#494F55] text-[#BABCBE]">
-              Accept Challange from {sudoChallanger}
+          <div className="w-3/12 ml-10 h-[150px] rounded-lg bg-[#BABCBE] flex-1 flex flex-col justify-between items-center ">
+            <div className="text-xl w-full h-19 flex flex-col items-center justify-center rounded-t-lg bg-[#494F55] text-[#BABCBE]">
+              <div>Accept Challange from</div>
+              <div>riteshsoni123</div>
             </div>
-            <div>
-              <button onClick={acceptChallange}>Accept</button>
-              <button>Decline</button>
+            <div className="mb-5 w-full flex justify-center ">
+              <button
+                className="mr-2 bg-[#DEE1E6] border-[1px] rounded-lg py-2 px-4 hover:scale-110 duration-300"
+                onClick={acceptChallange}
+              >
+                Accept
+              </button>
+              <button
+                className="ml-2 bg-[#494F55] border-[1px] rounded-lg py-2 px-4 hover:scale-110 duration-300"
+                onClick={declineChallange}
+              >
+                Decline
+              </button>
             </div>
           </div>
         )
