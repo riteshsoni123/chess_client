@@ -169,6 +169,7 @@ function Play(props) {
   // ]);
   const [color, setColor] = useState("w");
   const [selectedPosition, setSelectedPosition] = useState({});
+  const [socket, setSocket] = useState();
   const movements = [];
 
   // useEffect(() => {
@@ -457,6 +458,8 @@ function Play(props) {
         kingChecker={kingChecker}
         username={username}
         setUsername={setUsername}
+        socket={socket}
+        setSocket={setSocket}
       />
     </div>
   );

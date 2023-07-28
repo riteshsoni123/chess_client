@@ -5,11 +5,21 @@ import axios from "../../../axios";
 import "../../../index.css";
 
 function Game(props) {
-  const { positionClicked, piecePosition, username, setUsername } = props;
+  const {
+    positionClicked,
+    piecePosition,
+    username,
+    setUsername,
+    setPiecePosition,
+    setColor,
+    socket,
+    setSocket,
+    opponent,
+    setOpponent,
+    setTurn,
+  } = props;
   const navigate = useNavigate();
   const [mIndex, setimIndex] = useState(-1);
-  const [opponent, setOpponent] = useState("");
-  const [socket, setSocket] = useState();
   const [sudoOpponent, setSudoOpponent] = useState("");
   const [sudoChallanger, setSudoChallanger] = useState("");
   const [message, setMessage] = useState("");
@@ -98,6 +108,33 @@ function Game(props) {
     return () => socket.off("declineChallange");
   });
 
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("recieveCoinToss", (data) => {
+      console.log("recieved coin toss", data);
+
+      const newPosition = [];
+      for (let i = 7; i >= 0; i--) {
+        newPosition.push(piecePosition[i]);
+      }
+
+      setPiecePosition(newPosition);
+      setColor("b");
+      setTurn(false);
+    });
+    return () => socket.off("recieveCoinToss");
+  });
+
+  const coinToss = () => {
+    // console.log("recieved coin toss");
+    var num = Math.floor(Math.random() * 1000);
+    num = 22;
+    if (num % 2 === 0) {
+      socket.emit("sendCoinToss", { id: sudoChallanger, sender: username });
+    }
+  };
+
   const sendChallange = () => {
     socket.emit("sendChallange", { id: sudoOpponent, sender: username });
   };
@@ -105,6 +142,8 @@ function Game(props) {
   const acceptChallange = () => {
     socket.emit("acceptChallange", { id: sudoChallanger, sender: username });
     setOpponent(sudoChallanger);
+    // const myTimeout = setTimeout(coinToss, 5000);
+    coinToss();
   };
   const declineChallange = () => {
     socket.emit("declineChallange", { id: sudoChallanger, sender: username });
