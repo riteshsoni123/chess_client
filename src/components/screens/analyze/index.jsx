@@ -22,7 +22,7 @@ function Analyze(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          console.log("analyze", data);
+          // console.log("analyze", data);
           setUser(data);
           setOverall(data.overall);
           setWhite(data.white);

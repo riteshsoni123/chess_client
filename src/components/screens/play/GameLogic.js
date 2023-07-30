@@ -16,6 +16,7 @@ function GameLogic(props) {
     // setUsername,
     socket,
     setSocket,
+    defaultPiecePosition,
   } = props;
   const [opponent, setOpponent] = useState("");
   const [turn, setTurn] = useState(true);
@@ -139,6 +140,7 @@ function GameLogic(props) {
         opponent={opponent}
         setOpponent={setOpponent}
         setTurn={setTurn}
+        defaultPiecePosition={defaultPiecePosition}
       />
     </div>
   );

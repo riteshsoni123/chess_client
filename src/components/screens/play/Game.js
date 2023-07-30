@@ -9,7 +9,6 @@ function Game(props) {
     positionClicked,
     piecePosition,
     username,
-    // setUsername,
     setPiecePosition,
     setColor,
     socket,
@@ -17,7 +16,9 @@ function Game(props) {
     opponent,
     setOpponent,
     setTurn,
+    defaultPiecePosition,
   } = props;
+
   const navigate = useNavigate();
   const [mIndex, setimIndex] = useState(-1);
   const [sudoOpponent, setSudoOpponent] = useState("");
@@ -25,6 +26,9 @@ function Game(props) {
   const [message, setMessage] = useState("");
   const [challangeDecliner, setChallangeDecliner] = useState("");
   const [chats, setChats] = useState([]);
+  const [recievedDrawOffer, setRecievedDrawOffer] = useState(false);
+  const [gameEnded, setGameEneded] = useState(false);
+  const [gameStatus, setGameStatus] = useState("");
 
   useEffect(() => {
     if (!localStorage.getItem("authToken")) {
@@ -126,6 +130,37 @@ function Game(props) {
     return () => socket.off("recieveCoinToss");
   });
 
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("recieveDrawOffer", (data) => {
+      console.log("recieved draw offer", data);
+      setRecievedDrawOffer(true);
+    });
+    return () => socket.off("recieveDrawOffer");
+  });
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("drawAccepted", (data) => {
+      console.log("draw accepted", data);
+      setGameEneded(true);
+      setGameStatus("Drawn");
+    });
+    return () => socket.off("recieveDrawOffer");
+  });
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("opponentResigned", (data) => {
+      console.log("opponent resigned", data);
+      setGameEneded(true);
+      setGameStatus("Won");
+    });
+    return () => socket.off("recieveDrawOffer");
+  });
+
   const coinToss = () => {
     // console.log("recieved coin toss");
     var num = Math.floor(Math.random() * 1000);
@@ -165,6 +200,42 @@ function Game(props) {
       setMessage("");
     }
   };
+
+  const newGame = () => {
+    setOpponent("");
+    setSudoChallanger("");
+    setSudoOpponent("");
+    setChallangeDecliner("");
+    setGameStatus("");
+    setRecievedDrawOffer(false);
+    setGameEneded(false);
+    setPiecePosition(defaultPiecePosition);
+  };
+
+  const offerDraw = () => {
+    console.log("offer draw");
+    socket.emit("offerDraw", { id: opponent, message: "draw offer" });
+  };
+
+  const acceptDraw = () => {
+    console.log("Draw accepted");
+    socket.emit("acceptDraw", { id: opponent, message: "draw accepted" });
+    setGameEneded(true);
+    setRecievedDrawOffer(false);
+    setGameStatus("Drawn");
+  };
+
+  const declineDraw = () => {
+    console.log("Draw declined");
+    setRecievedDrawOffer(false);
+  };
+
+  const resign = () => {
+    console.log("resign");
+    socket.emit("userResigned", { id: opponent, message: "user resigned" });
+    setGameStatus("Lost");
+    setGameEneded(true);
+  }; // console.log("recieved coin toss", data);
 
   return (
     <div className="container m-auto flex flex-row justify-center items-center w-2/3 mt-10 [&>div]:shadow-xl">
@@ -207,6 +278,30 @@ function Game(props) {
         })}
         <div className="bg-[#494F55] rounded-b-md h-10 text-xl text-[#BABCBE] flex items-center justify-between px-3">
           <div>{username}</div>
+          {recievedDrawOffer ? (
+            <div className="w-80 flex justify-between items-center">
+              <div>Draw Offered:</div>
+              <div>
+                <button
+                  className="bg-[#DEE1E6] border-[1px] rounded-lg py-0.5 px-1 hover:scale-110 duration-300"
+                  onClick={() => acceptDraw()}
+                >
+                  Accept
+                </button>
+              </div>
+              <div>
+                <button
+                  className="bg-[#494F55] border-[1px] rounded-lg py-0.5 px-1 hover:scale-110 duration-300"
+                  onClick={() => declineDraw()}
+                >
+                  Decline
+                </button>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+          {gameStatus === "" ? <></> : <div>{`Game : ${gameStatus}`}</div>}
           <div>5:00</div>
         </div>
       </div>
@@ -318,15 +413,22 @@ function Game(props) {
             </div>
           </div>
           <div className="rounded-b-lg h-[30px]">
-            <div className="flex flex-row h-full [&>div>button]:rounded-b-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-b-lg ">
-              <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
-                <button>Draw</button>
+            {gameEnded ? (
+              <div className="bg-[#494F55] hover:bg-[#535353] flex flex-row h-full [&>button]:w-full [&>button]:h-full rounded-b-lg text-[#BABCBE]">
+                <button onClick={() => newGame()}>New Game</button>
               </div>
-              <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
-                <button>Resign</button>
+            ) : (
+              <div className="flex flex-row h-full [&>div>button]:rounded-b-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-b-lg ">
+                <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+                  <button onClick={() => offerDraw()}>Draw</button>
+                </div>
+                <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
+                  <button onClick={() => resign()}>Resign</button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
+
           <div className="h-[190px]">
             <div className="overflow-y-scroll no-scrollbar h-[150px] border-b-[1px] border-black">
               {chats.map((chat, i) => {
