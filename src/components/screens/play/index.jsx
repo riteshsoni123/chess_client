@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import GameLogic from "./GameLogic";
 
 function Play(props) {
-  const { username, setUsername } = props;
+  const { username } = props;
   const [piecePosition, setPiecePosition] = useState([
     [
       { id: "a8", selected: false, white: true, piece: "b_rook" },
@@ -457,7 +457,7 @@ function Play(props) {
         setSelectedPosition={setSelectedPosition}
         kingChecker={kingChecker}
         username={username}
-        setUsername={setUsername}
+        // setUsername={setUsername}
         socket={socket}
         setSocket={setSocket}
       />

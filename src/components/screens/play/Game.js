@@ -9,7 +9,7 @@ function Game(props) {
     positionClicked,
     piecePosition,
     username,
-    setUsername,
+    // setUsername,
     setPiecePosition,
     setColor,
     socket,
@@ -223,7 +223,7 @@ function Game(props) {
                 className="rounded-md h-8 mx-3 px-2 w-full"
                 value={sudoOpponent}
                 onChange={(e) => {
-                  setUsername(username);
+                  // setUsername(username);
                   setSudoOpponent(e.target.value);
                 }}
               />

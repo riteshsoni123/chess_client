@@ -3,7 +3,8 @@ import axios from "../../../axios";
 import { Link, useNavigate } from "react-router-dom";
 import google_image from "../../../google.svg";
 
-export default function Signup() {
+export default function Signup(props) {
+  const { setUser } = props;
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -53,6 +54,26 @@ export default function Signup() {
         config
       );
       localStorage.setItem("authToken", data.token);
+
+      const fetchPrivateData = async () => {
+        const config = {
+          headers: {
+            contentType: "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        };
+
+        try {
+          const { data } = await axios.get("/api/private", config);
+          console.log("signin", data);
+          setUser(data);
+        } catch (error) {
+          localStorage.removeItem("authToken");
+          // setError("You are not authorized please login");
+        }
+      };
+      fetchPrivateData();
+
       navigate("/");
     } catch (error) {
       setError(error.response.data.error);

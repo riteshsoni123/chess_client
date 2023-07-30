@@ -10,11 +10,14 @@ import Replay from "./components/screens/replay";
 import Sidebar from "./components/screens/sidebar";
 
 function App() {
-  const [username, setUsername] = useState();
+  const [user, setUser] = useState({});
+  const [overall, setOverall] = useState({});
+  const [white, setWhite] = useState({});
 
   useEffect(() => {
-    console.log("useEffect ran");
-    if (localStorage.getItem("authToken")) {
+    if (user.username !== undefined) {
+      return;
+    } else if (localStorage.getItem("authToken")) {
       const fetchPrivateData = async () => {
         const config = {
           headers: {
@@ -25,7 +28,10 @@ function App() {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          setUsername(data.username);
+          console.log("app.js", data);
+          setUser(data);
+          setOverall(data.overall);
+          setWhite(data.white);
         } catch (error) {
           localStorage.removeItem("authToken");
           // setError("You are not authorized please login");
@@ -33,21 +39,34 @@ function App() {
       };
       fetchPrivateData();
     }
-  }, [username]);
+  }, [user, overall, white]);
 
   return (
     <div className="flex flex-row">
       <Sidebar />
       <Routes>
+        <Route exact path="/" element={<Play username={user.username} />} />
+        <Route exact path="/signin" element={<Login setUser={setUser} />} />
+        <Route exact path="/signup" element={<Signup setUser={setUser} />} />
         <Route
           exact
-          path="/"
-          element={<Play username={username} setUsername={setUsername} />}
+          path="/settings"
+          element={<Settings user={user} setUser={setUser} />}
         />
-        <Route exact path="/signin" element={<Login />} />
-        <Route exact path="/signup" element={<Signup />} />
-        <Route exact path="/settings" element={<Settings />} />
-        <Route exact path="/analyze" element={<Analyze />} />
+        <Route
+          exact
+          path="/analyze"
+          element={
+            <Analyze
+              overall={overall}
+              white={white}
+              user={user}
+              setUser={setUser}
+              setOverall={setOverall}
+              setWhite={setWhite}
+            />
+          }
+        />
         <Route exact path="/replay" element={<Replay />} />
       </Routes>
     </div>

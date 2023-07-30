@@ -1,87 +1,120 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "../../../axios";
 import unknown from "../../../unknown.jpeg";
 
-function Settings() {
+function Settings(props) {
+  const { user, setUser } = props;
   const [key, setKey] = useState("");
   const [editValue, setEditValue] = useState("");
-  // const [user, setUser] = useState({
-  //   username: data.user.username,
-  //   location: !data.user.location ? "" : data.user.location,
-  //   summary: !data.user.summary ? "" : data.user.summary,
-  //   website: !data.user.website ? "" : data.user.website,
-  //   github: !data.user.github ? "" : data.user.github,
-  //   linkedin: !data.user.linkedin ? "" : data.user.linkedin,
-  //   twitter: !data.user.twitter ? "" : data.user.twitter,
-  //   work: !data.user.work ? "" : data.user.work,
-  //   education: !data.user.education ? "" : data.user.education,
-  //   skill: !data.user.skill ? "" : data.user.skill,
-  // });
 
-  const [user, setUser] = useState({
-    Username: "",
-    "First Name": "",
-    "Last Name": "",
-    "Emaill address": "",
-    Location: "",
-    Country: "",
-    Language: "",
-    Twitter: "",
-    FaceBook: "",
-    Instagram: "",
-    Summary: "",
+  const [userData, setUserData] = useState({
+    username: "",
+    first: "",
+    lastname: "",
+    email: "",
+    location: "",
+    country: "",
+    language: "",
+    twitter: "",
+    faceBook: "",
+    instagram: "",
+    aboutme: "",
   });
 
+  useEffect(() => {
+    if (user.username !== undefined) {
+      setUserData({
+        _id: user._id,
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        location: user.location,
+        country: user.country,
+        language: user.language,
+        twitter: user.twitter,
+        facebook: user.facebook,
+        instagram: user.instagram,
+        aboutme: user.aboutme,
+      });
+      return;
+    } else if (localStorage.getItem("authToken")) {
+      const fetchPrivateData = async () => {
+        const config = {
+          headers: {
+            contentType: "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        };
+
+        try {
+          const { data } = await axios.get("/api/private", config);
+          console.log("settings", data);
+          setUser(data);
+        } catch (error) {
+          localStorage.removeItem("authToken");
+          // setError("You are not authorized please login");
+        }
+      };
+      fetchPrivateData();
+    }
+  }, [user]);
+
   const user_default = {
-    Username: "Your username",
-    "First Name": "What is you first name?",
-    "Last Name": "What is your second name?",
-    "Emaill address": "What is your email address?",
-    Location: "Where do you live?",
-    Country: "What is your nationality?",
-    Language: "What are the languages that you speek?",
-    Twitter: "Add your twitter URL",
-    FaceBook: "Add your facebook URL",
-    Instagram: "Add your instagram URL",
-    Summary: "Tell us something about yourself",
+    username: "Your username",
+    firstname: "What is you first name?",
+    lastname: "What is your second name?",
+    email: "What is your email address?",
+    location: "Where do you live?",
+    country: "What is your nationality?",
+    language: "What are the languages that you speek?",
+    twitter: "Add your twitter URL",
+    facebook: "Add your facebook URL",
+    instagram: "Add your instagram URL",
+    aboutme: "Tell us something about yourself",
   };
 
   const basic_info = [
-    "Username",
-    "First Name",
-    "Last Name",
-    "Emaill address",
-    "Location",
-    "Country",
-    "Language",
-    "Twitter",
-    "FaceBook",
-    "Instagram",
-    "Summary",
+    "username",
+    "firstname",
+    "lastname",
+    "email",
+    "location",
+    "country",
+    "language",
+    "twitter",
+    "facebook",
+    "instagram",
+    "aboutme",
   ];
 
   const editClicked = (key) => {
-    console.log(key, user[key]);
+    console.log(key, userData[key]);
     setKey(key);
-    setEditValue(user[key]);
+    setEditValue(userData[key]);
   };
 
   const saveButton = async () => {
-    // user[key] = editValue;
-    // setUser(user);
-    // console.log(user);
-    // const config = {
-    //   headers: {
-    //     contentType: "application/json",
-    //   },
-    // };
-    // try {
-    //   const url = `${process.env.REACT_APP_API_URL}/auth/editdetail/${data.user._id}`;
-    //   await axios.post(url, user, config);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    // setKey("");
-    // setEditValue("");
+    // const tempUser = user;
+    userData[key] = editValue;
+
+    setUserData(userData);
+    setUser(userData);
+    const config = {
+      headers: {
+        contentType: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    };
+    try {
+      const url = `/api/private/editdetail/${userData._id}`;
+      await axios.post(url, userData, config);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setKey("");
+    setEditValue("");
   };
 
   const cancelButton = () => {
@@ -103,9 +136,10 @@ function Settings() {
           <div>
             <div className="font-bold">About me:</div>
             <div className="font-light">
-              Love playing chess. Fell in love with the complexity of the game.
+              {/* Love playing chess. Fell in love with the complexity of the game.
               I always look for challanges and try to be creative in the game. I
-              also feel that it is the sport for everyone
+              also feel that it is the sport for everyone */}
+              {userData.aboutme}
             </div>
           </div>
         </div>
@@ -116,7 +150,7 @@ function Settings() {
             Basic Info
           </h1>
         </div>
-        <div className="[&>div]:mt-2 [&>div]:flex [&>div]:justify-between [&>div]:border-b-[1px] [&>div]:border-black [&>div]:p-2 [&>div>p]:text-blue-600 [&>div>p]:cursor-pointer [&>div>p]:text-right">
+        <div className="[&>div]:mt-2 [&>div]:flex [&>div]:justify-between [&>div]:border-b-[1px] [&>div]:border-black [&>div]:p-2">
           {basic_info.map((element) => {
             return key === element ? (
               <div key={element}>
@@ -142,16 +176,34 @@ function Settings() {
                 </div>
               </div>
             ) : (
-              <div key={element}>
+              <div
+                key={element}
+                className="[&>p]:cursor-pointer [&>p]:w-10 [&>p]:mr-5 [&>p]:flex [&>p]:justify-center"
+              >
                 <span className="w-1/4 ml-5 font-bold">
                   {element.charAt(0).toUpperCase() + element.slice(1)}
                 </span>
-                <span className="w-2/4">
-                  {user[element] === "" ? user_default[element] : user[element]}
+                <span
+                  className={
+                    userData[element] === ""
+                      ? "text-[#808080] w-2/4"
+                      : "" + "w-2/4"
+                  }
+                >
+                  {userData[element] === ""
+                    ? user_default[element]
+                    : userData[element]}
                 </span>
-                <p className="w-1/4 mr-5" onClick={() => editClicked(element)}>
-                  Edit
-                </p>
+                {element === "username" || element === "email" ? (
+                  <p className="text-[#727272]">Edit</p>
+                ) : (
+                  <p
+                    className="text-blue-600"
+                    onClick={() => editClicked(element)}
+                  >
+                    Edit
+                  </p>
+                )}
               </div>
             );
           })}

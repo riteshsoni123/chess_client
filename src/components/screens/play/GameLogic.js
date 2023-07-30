@@ -13,7 +13,7 @@ function GameLogic(props) {
     setSelectedPosition,
     kingChecker,
     username,
-    setUsername,
+    // setUsername,
     socket,
     setSocket,
   } = props;
@@ -132,7 +132,7 @@ function GameLogic(props) {
         positionClicked={positionClicked}
         setPiecePosition={setPiecePosition}
         username={username}
-        setUsername={setUsername}
+        // setUsername={setUsername}
         setColor={setColor}
         socket={socket}
         setSocket={setSocket}

@@ -1,13 +1,49 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "../../../axios";
 import unknown from "../../../unknown.jpeg";
 import PieChart from "./Piechart";
 
-function Analyze() {
+function Analyze(props) {
+  const { overall, white, user, setUser, setOverall, setWhite } = props;
+  // console.log(overall, white);
+
+  useEffect(() => {
+    if (user.username !== undefined) {
+      return;
+    } else if (localStorage.getItem("authToken")) {
+      console.log("data fetched");
+      const fetchPrivateData = async () => {
+        const config = {
+          headers: {
+            contentType: "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        };
+
+        try {
+          const { data } = await axios.get("/api/private", config);
+          console.log("analyze", data);
+          setUser(data);
+          setOverall(data.overall);
+          setWhite(data.white);
+        } catch (error) {
+          localStorage.removeItem("authToken");
+          // setError("You are not authorized please login");
+        }
+      };
+      fetchPrivateData();
+    }
+  }, [user]);
+
   const overall_data = {
     labels: ["Won", "Lost", "Drawn"],
     datasets: [
       {
-        data: [150, 170, 36],
+        data: [
+          overall.won,
+          overall.lost,
+          overall.played - overall.won - overall.lost,
+        ],
         backgroundColor: ["#7393B3", "#848884", "#E5E4E2"],
       },
     ],
@@ -16,7 +52,7 @@ function Analyze() {
     labels: ["Won", "Lost", "Drawn"],
     datasets: [
       {
-        data: [120, 70, 10],
+        data: [white.won, white.lost, white.played - white.won - white.lost],
         backgroundColor: ["#7393B3", "#848884", "#E5E4E2"],
       },
     ],
@@ -25,7 +61,14 @@ function Analyze() {
     labels: ["Won", "Lost", "Drawn"],
     datasets: [
       {
-        data: [60, 80, 16],
+        data: [
+          overall.won - white.won,
+          overall.lost - white.lost,
+          overall.played -
+            overall.won -
+            overall.lost -
+            (white.played - white.won - white.lost),
+        ],
         backgroundColor: ["#7393B3", "#848884", "#E5E4E2"],
       },
     ],
