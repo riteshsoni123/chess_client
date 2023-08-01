@@ -33,7 +33,7 @@ function Analyze(props) {
       };
       fetchPrivateData();
     }
-  }, [user]);
+  }, [user, setOverall, setUser, setWhite]);
 
   const overall_data = {
     labels: ["Won", "Lost", "Drawn"],

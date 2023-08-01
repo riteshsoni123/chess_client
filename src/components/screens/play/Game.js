@@ -65,7 +65,7 @@ function Game(props) {
     });
     setSocket(newSocket);
     return () => newSocket.close();
-  }, [username]);
+  }, [username, setSocket]);
 
   useEffect(() => {
     if (socket == null) return;

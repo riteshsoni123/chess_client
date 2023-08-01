@@ -58,7 +58,7 @@ function Settings(props) {
       };
       fetchPrivateData();
     }
-  }, [user]);
+  }, [user, setUser]);
 
   const user_default = {
     username: "Your username",
