@@ -21,6 +21,7 @@ export default function Signup(props) {
 
   const registerHandler = async (e) => {
     // console.log(process.env.REACT_APP_BACKEND_URL);
+    console.log(error);
     e.preventDefault();
 
     const config = {

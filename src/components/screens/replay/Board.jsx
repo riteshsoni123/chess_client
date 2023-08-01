@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import "../../../index.css";
 
 function Board(props) {
-  const [opponent, setOpponent] = useState("unknown");
+  // const [opponent, setOpponent] = useState("unknown");
+  const opponent = "unknown";
   const username = "riteshsoni123";
   const {
     mIndex,
@@ -39,6 +40,7 @@ function Board(props) {
                       {square.piece ? (
                         <img
                           src={require(`../../../pieceImg/${square.piece}.png`)}
+                          alt=""
                         />
                       ) : (
                         ""

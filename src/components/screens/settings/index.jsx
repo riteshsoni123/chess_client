@@ -185,9 +185,7 @@ function Settings(props) {
                 </span>
                 <span
                   className={
-                    userData[element] === ""
-                      ? "text-[#808080] w-2/4"
-                      : "" + "w-2/4"
+                    userData[element] === "" ? "text-[#808080] w-2/4" : "w-2/4"
                   }
                 >
                   {userData[element] === ""

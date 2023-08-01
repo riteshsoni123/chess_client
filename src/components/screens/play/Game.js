@@ -10,6 +10,7 @@ function Game(props) {
     piecePosition,
     username,
     setPiecePosition,
+    // setLastPiecePosition,
     setColor,
     socket,
     setSocket,
@@ -17,10 +18,13 @@ function Game(props) {
     setOpponent,
     setTurn,
     defaultPiecePosition,
+    increase_moves_index,
+    reduce_moves_index,
+    movesNotation,
+    mIndex,
   } = props;
 
   const navigate = useNavigate();
-  const [mIndex, setimIndex] = useState(-1);
   const [sudoOpponent, setSudoOpponent] = useState("");
   const [sudoChallanger, setSudoChallanger] = useState("");
   const [message, setMessage] = useState("");
@@ -44,6 +48,7 @@ function Game(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
+          console.log(data);
         } catch (error) {
           localStorage.removeItem("authToken");
           // setError("You are not authorized please login");
@@ -52,9 +57,6 @@ function Game(props) {
       fetchPrivateData();
     }
   }, [navigate]);
-
-  const moves_notation = [];
-  moves_notation.push({ id: 1, first: "h1-h2", second: "h2-h3" });
 
   useEffect(() => {
     console.log("function ran again");
@@ -124,6 +126,7 @@ function Game(props) {
       }
 
       setPiecePosition(newPosition);
+      // setLastPiecePosition(newPosition);
       setColor("b");
       setTurn(false);
     });
@@ -265,6 +268,7 @@ function Game(props) {
                       {square.piece ? (
                         <img
                           src={require(`../../../pieceImg/${square.piece}.png`)}
+                          alt=""
                         />
                       ) : (
                         ""
@@ -366,14 +370,14 @@ function Game(props) {
           </div>
           <div className="h-[430px]">
             <div className="w-1/1 overflow-y-scroll no-scrollbar h-full">
-              {moves_notation.map((move) => {
+              {movesNotation.map((move) => {
                 return (
                   <div
                     key={move.id}
                     className="flex flex-row [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center"
                   >
                     <span className="px-1 bg-[#C0C0C0] w-[30px]">
-                      {move.id}.
+                      {move.id + 1}.
                     </span>
                     <div
                       className={
@@ -405,10 +409,10 @@ function Game(props) {
           <div className="rounded-t-lg h-[30px] mb-[1px]">
             <div className="flex flex-row h-full [&>div>button]:rounded-t-lg [&>div>button]:w-full [&>div>button]:h-full [&>div]:h-full [&>div]:w-1/2 [&>div]:flex [&>div]:justify-center [&>div]:items-center [&>div]:cursor-pointer [&>div]:text-[#BABCBE] [&>div]:rounded-t-lg ">
               <div className="mr-[0.5px] bg-[#494F55] hover:bg-[#535353]">
-                <button>Backward</button>
+                <button onClick={() => reduce_moves_index()}>Backward</button>
               </div>
               <div className="ml-[0.5px] bg-[#494F55] hover:bg-[#535353]">
-                <button>Forward</button>
+                <button onClick={() => increase_moves_index()}>Forward</button>
               </div>
             </div>
           </div>
