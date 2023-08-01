@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "../../../axios";
 import unknown from "../../../unknown.jpeg";
 import PieChart from "./Piechart";
 
 function Analyze(props) {
   const { overall, white, user, setUser, setOverall, setWhite } = props;
+  const navigate = useNavigate();
+  const [games, setGames] = useState([]);
   // console.log(overall, white);
 
   useEffect(() => {
@@ -22,7 +25,8 @@ function Analyze(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          // console.log("analyze", data);
+
+          console.log("analyze", data);
           setUser(data);
           setOverall(data.overall);
           setWhite(data.white);
@@ -34,6 +38,29 @@ function Analyze(props) {
       fetchPrivateData();
     }
   }, [user, setOverall, setUser, setWhite]);
+
+  useEffect(() => {
+    if (user.username === undefined) return;
+    console.log("useEffect ran");
+    const fetchPrivateData = async () => {
+      const config = {
+        headers: {
+          contentType: "application/json",
+        },
+      };
+      try {
+        const { data } = await axios.get(
+          `/game/getGameList/${user.username}`,
+          config
+        );
+        console.log(data);
+        setGames(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchPrivateData();
+  }, [user]);
 
   const overall_data = {
     labels: ["Won", "Lost", "Drawn"],
@@ -74,80 +101,10 @@ function Analyze(props) {
     ],
   };
 
-  const games = [
-    {
-      key: 1,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 2,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 3,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 4,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 5,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 6,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 7,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-    {
-      key: 8,
-      first: "riteshsoni123",
-      second: "vicky4",
-      first_res: 1,
-      second_res: 0,
-      moves: 30,
-      date: "13/02/2024",
-    },
-  ];
+  const gameClicked = (index) => {
+    console.log(index);
+    navigate("/replay", { state: games[index] });
+  };
 
   return (
     <div className="container mx-auto w-2/5 [&>div]:shadow-2xl [&>div]:bg-[#BABCBE]">
@@ -184,7 +141,7 @@ function Analyze(props) {
           <PieChart data={black_data} />
         </div>
       </div>
-      <div className="rounded-t-lg [&>div]:flex [&>div]:justify-between">
+      <div className="rounded-t-lg [&>div]:flex [&>div]:justify-between mb-10">
         <p className="bg-[#727272] h-10 rounded-t-lg text-2xl text-white flex justify-center items-center">
           Completed Games
         </p>
@@ -194,22 +151,23 @@ function Analyze(props) {
           <div className="w-1/6">Moves</div>
           <div className="w-2/6">Date</div>
         </div>
-        {games.map((game) => {
+        {games.map((game, index) => {
           return (
             <div
-              key={game.key}
-              className="[&>div]:flex [&>div]:flex-col [&>div]:items-center border-b-[1px] border-black p-2"
+              key={index}
+              className="[&>div]:flex [&>div]:flex-col [&>div]:items-center border-b-[1px] border-black hover:bg-[#727272] cursor-pointer p-2"
+              onClick={() => gameClicked(index)}
             >
               <div className="w-2/6">
-                <div>riteshsoni123</div>
-                <div>vicky4</div>
+                <div>{game.first}</div>
+                <div>{game.second}</div>
               </div>
               <div className="w-1/6">
-                <div>1</div>
-                <div>0</div>
+                <div>{game.first_res}</div>
+                <div>{game.second_res}</div>
               </div>
-              <div className="w-1/6">30</div>
-              <div className="w-2/6">13/02/2024</div>
+              <div className="w-1/6">{game.moves}</div>
+              <div className="w-2/6">{game.date.substring(0, 10)}</div>
             </div>
           );
         })}

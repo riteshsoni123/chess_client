@@ -251,6 +251,8 @@ function GameLogic(props) {
         reduce_moves_index={reduce_moves_index}
         movesNotation={movesNotation}
         mIndex={mIndex}
+        movesIndex={movesIndex}
+        color={color}
       />
     </div>
   );

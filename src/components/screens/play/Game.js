@@ -11,6 +11,7 @@ function Game(props) {
     username,
     setPiecePosition,
     // setLastPiecePosition,
+    color,
     setColor,
     socket,
     setSocket,
@@ -22,6 +23,7 @@ function Game(props) {
     reduce_moves_index,
     movesNotation,
     mIndex,
+    movesIndex,
   } = props;
 
   const navigate = useNavigate();
@@ -163,6 +165,49 @@ function Game(props) {
     });
     return () => socket.off("recieveDrawOffer");
   });
+
+  useEffect(() => {
+    if (gameStatus === "") return;
+    if (color === "b") return;
+
+    const saveGame = async () => {
+      const config = {
+        headers: {
+          contentType: "application/json",
+        },
+      };
+
+      const result = {
+        first: username,
+        second: opponent,
+        first_res: "",
+        second_res: "",
+        moves: movesNotation.length,
+        moves_index: movesIndex,
+      };
+
+      if (gameStatus === "Won") {
+        result["first_res"] = "1";
+        result["second_res"] = "0";
+      } else if (gameStatus === "Lost") {
+        result["first_res"] = "0";
+        result["second_res"] = "1";
+      } else {
+        result["first_res"] = "1/2";
+        result["second_res"] = "1/2";
+      }
+
+      try {
+        const { data } = await axios.post("/game/saveResult", result, config);
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+        // localStorage.removeItem("authToken");
+        // setError("You are not authorized please login");
+      }
+    };
+    saveGame();
+  }, [gameStatus, color]);
 
   const coinToss = () => {
     // console.log("recieved coin toss");

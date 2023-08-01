@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Board from "./Board";
 
 function Position(props) {
-  const { moves_index } = props;
+  const { moves_index, first, second, first_res, second_res } = props;
   const [mIndex, setmIndex] = useState(-1);
   const moves_notation = [];
 
@@ -100,20 +100,16 @@ function Position(props) {
     } else {
       moves_notation[moves_notation.length - 1].second = s;
     }
-    // moves_notation.push(s);
   }
 
   const changePosition = (t, back) => {
     const newPiecePosition = [...piecePosition];
 
-    const si = moves_index[t].si;
-    const sj = moves_index[t].sj;
-    const ei = moves_index[t].ei;
-    const ej = moves_index[t].ej;
+    const { si, sj, ei, ej, deletedPiece } = moves_index[t];
 
     if (back) {
       newPiecePosition[si][sj].piece = newPiecePosition[ei][ej].piece;
-      newPiecePosition[ei][ej].piece = "";
+      newPiecePosition[ei][ej].piece = deletedPiece;
     } else {
       newPiecePosition[ei][ej].piece = newPiecePosition[si][sj].piece;
       newPiecePosition[si][sj].piece = "";
@@ -134,11 +130,6 @@ function Position(props) {
     setmIndex((val) => val + 1);
   };
 
-  useEffect(() => {
-    // console.log(mIndex);
-    // console.log("useEffect ran");
-  }, [mIndex]);
-
   return (
     <div className="container mx-auto">
       <Board
@@ -147,6 +138,10 @@ function Position(props) {
         moves_notation={moves_notation}
         increase_moves_index={increase_moves_index}
         reduce_moves_index={reduce_moves_index}
+        first={first}
+        second={second}
+        first_res={first_res}
+        second_res={second_res}
       />
     </div>
   );

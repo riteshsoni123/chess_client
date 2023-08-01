@@ -2,22 +2,30 @@ import React from "react";
 import "../../../index.css";
 
 function Board(props) {
-  // const [opponent, setOpponent] = useState("unknown");
-  const opponent = "unknown";
-  const username = "riteshsoni123";
   const {
     mIndex,
     piecePosition,
     moves_notation,
     reduce_moves_index,
     increase_moves_index,
+    first,
+    second,
+    first_res,
+    second_res,
   } = props;
 
   return (
     <div className="container m-auto flex flex-row justify-center items-center w-2/3 mt-10 [&>div]:shadow-xl">
       <div className="w-8/10">
         <div className="bg-[#494F55] rounded-t-md h-[40px] text-xl text-[#BABCBE] flex items-center justify-between px-3">
-          <div>{opponent}</div>
+          <div>{second}</div>
+          <div>
+            {first_res === "1"
+              ? "Game won"
+              : first_res === "0"
+              ? "Game Lost"
+              : "Game Drawn"}
+          </div>
           <div>5:00</div>
         </div>
         {piecePosition.map((row, i) => {
@@ -53,7 +61,14 @@ function Board(props) {
           );
         })}
         <div className="bg-[#494F55] rounded-b-md h-10 text-xl text-[#BABCBE] flex items-center justify-between px-3">
-          <div>{username}</div>
+          <div>{first}</div>
+          <div>
+            {second_res === "1"
+              ? "Game won"
+              : first_res === "0"
+              ? "Game Lost"
+              : "Game Drawn"}
+          </div>
           <div>5:00</div>
         </div>
       </div>
