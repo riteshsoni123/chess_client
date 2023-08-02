@@ -266,7 +266,7 @@ function Play(props) {
   };
 
   const kingChecker = () => {
-    console.log("hi");
+    // console.log("hi");
 
     let r = -1,
       c = -1;
@@ -283,7 +283,7 @@ function Play(props) {
       }
     }
 
-    console.log(r, c);
+    // console.log(r, c);
 
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -295,7 +295,7 @@ function Play(props) {
         for (let k = 0; k < movements.length; k++) {
           const { x, y } = movements[k];
           if (x === r && y === c) {
-            console.log("bazinga");
+            // console.log("bazinga");
             return false;
           }
         }

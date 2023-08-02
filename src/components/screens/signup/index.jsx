@@ -14,7 +14,7 @@ export default function Signup(props) {
 
   useEffect(() => {
     if (localStorage.getItem("authToken")) {
-      console.log(localStorage.getItem("authToken"));
+      // console.log(localStorage.getItem("authToken"));
       navigate("/");
     }
   }, [navigate]);
@@ -46,7 +46,7 @@ export default function Signup(props) {
       username += email[i];
     }
 
-    console.log(username, email, password);
+    // console.log(username, email, password);
 
     try {
       const { data } = await axios.post(

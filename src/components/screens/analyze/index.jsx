@@ -14,7 +14,7 @@ function Analyze(props) {
     if (user.username !== undefined) {
       return;
     } else if (localStorage.getItem("authToken")) {
-      console.log("data fetched");
+      // console.log("data fetched");
       const fetchPrivateData = async () => {
         const config = {
           headers: {
@@ -26,7 +26,7 @@ function Analyze(props) {
         try {
           const { data } = await axios.get("/api/private", config);
 
-          console.log("analyze", data);
+          // console.log("analyze", data);
           setUser(data);
           setOverall(data.overall);
           setWhite(data.white);
@@ -41,7 +41,7 @@ function Analyze(props) {
 
   useEffect(() => {
     if (user.username === undefined) return;
-    console.log("useEffect ran");
+    // console.log("useEffect ran");
     const fetchPrivateData = async () => {
       const config = {
         headers: {
@@ -53,7 +53,7 @@ function Analyze(props) {
           `/game/getGameList/${user.username}`,
           config
         );
-        console.log(data);
+        // console.log(data);
         setGames(data);
       } catch (error) {
         console.log(error);
@@ -102,7 +102,7 @@ function Analyze(props) {
   };
 
   const gameClicked = (index) => {
-    console.log(index);
+    // console.log(index);
     navigate("/replay", { state: games[index] });
   };
 
@@ -114,15 +114,18 @@ function Analyze(props) {
         </div>
         <div className="w-2/4 [&>div]:mt-5">
           <div>
-            <div className="text-black text-3xl">riteshsoni123</div>
-            <div className="text-[#808080] text-2xl">Ritesh Soni</div>
+            <div className="text-black text-3xl">{user.username}</div>
+            <div className="text-[#808080] text-2xl">
+              {user.firstname + " " + user.lastname}
+            </div>
           </div>
           <div>
             <div className="font-bold">About me:</div>
             <div className="font-light">
-              Love playing chess. Fell in love with the complexity of the game.
+              {/* Love playing chess. Fell in love with the complexity of the game.
               I always look for challanges and try to be creative in the game. I
-              also feel that it is the sport for everyone
+              also feel that it is the sport for everyone */}
+              {user.aboutme}
             </div>
           </div>
         </div>

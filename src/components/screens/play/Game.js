@@ -35,6 +35,7 @@ function Game(props) {
   const [recievedDrawOffer, setRecievedDrawOffer] = useState(false);
   const [gameEnded, setGameEneded] = useState(false);
   const [gameStatus, setGameStatus] = useState("");
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     if (!localStorage.getItem("authToken")) {
@@ -50,7 +51,8 @@ function Game(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          console.log(data);
+          // console.log("play", data);
+          setUser(data);
         } catch (error) {
           localStorage.removeItem("authToken");
           // setError("You are not authorized please login");
@@ -61,7 +63,7 @@ function Game(props) {
   }, [navigate]);
 
   useEffect(() => {
-    console.log("function ran again");
+    // console.log("function ran again");
     const newSocket = io(process.env.REACT_APP_BACKEND_URL, {
       query: { username },
     });
@@ -73,7 +75,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("recieveChallange", (data) => {
-      console.log("challange created", data);
+      // console.log("challange created", data);
       setSudoChallanger(data);
     });
     return () => socket.off("recieveChallange");
@@ -83,7 +85,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("acceptedChallange", (data) => {
-      console.log("challange accepted", data);
+      // console.log("challange accepted", data);
       setOpponent(data);
     });
     return () => socket.off("acceptedChallange");
@@ -93,7 +95,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("recieveMessage", (data) => {
-      console.log("message recieved", data);
+      // console.log("message recieved", data);
       const newChats = [...chats];
 
       newChats.push({
@@ -110,7 +112,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("declineChallange", (data) => {
-      console.log("challange declined by: ", data);
+      // console.log("challange declined by: ", data);
       setChallangeDecliner(data);
     });
     return () => socket.off("declineChallange");
@@ -119,8 +121,10 @@ function Game(props) {
   useEffect(() => {
     if (socket == null) return;
 
+    // console.log("recieved the coin toss");
+
     socket.on("recieveCoinToss", (data) => {
-      console.log("recieved coin toss", data);
+      // console.log("recieved coin toss", data);
 
       const newPosition = [];
       for (let i = 7; i >= 0; i--) {
@@ -139,7 +143,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("recieveDrawOffer", (data) => {
-      console.log("recieved draw offer", data);
+      // console.log("recieved draw offer", data);
       setRecievedDrawOffer(true);
     });
     return () => socket.off("recieveDrawOffer");
@@ -149,7 +153,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("drawAccepted", (data) => {
-      console.log("draw accepted", data);
+      // console.log("draw accepted", data);
       setGameEneded(true);
       setGameStatus("Drawn");
     });
@@ -159,7 +163,7 @@ function Game(props) {
     if (socket == null) return;
 
     socket.on("opponentResigned", (data) => {
-      console.log("opponent resigned", data);
+      // console.log("opponent resigned", data);
       setGameEneded(true);
       setGameStatus("Won");
     });
@@ -168,6 +172,54 @@ function Game(props) {
 
   useEffect(() => {
     if (gameStatus === "") return;
+
+    const updateStats = async () => {
+      const config = {
+        headers: {
+          contentType: "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      };
+
+      const updatedUser = user;
+
+      updatedUser["overall"]["played"] += 1;
+      if (gameStatus === "Won") {
+        updatedUser["overall"]["won"] += 1;
+      } else if (gameStatus === "Lost") {
+        updatedUser["overall"]["lost"] += 1;
+      }
+
+      if (color === "w") {
+        updatedUser["white"]["played"] += 1;
+        if (gameStatus === "Won") {
+          updatedUser["white"]["won"] += 1;
+        } else if (gameStatus === "Lost") {
+          updatedUser["white"]["lost"] += 1;
+        }
+      }
+
+      try {
+        const url = `/api/private/editdetail/${updatedUser._id}`;
+        await axios.post(url, updatedUser, config);
+      } catch (error) {
+        console.log(error);
+      }
+
+      // try {
+      //   const { data } = await axios.get("/api/private", config);
+      //   console.log("app.js", data);
+      //   setUser(data);
+      //   setOverall(data.overall);
+      //   setWhite(data.white);
+      // } catch (error) {
+      //   localStorage.removeItem("authToken");
+      //   // setError("You are not authorized please login");
+      // }
+    };
+
+    updateStats();
+
     if (color === "b") return;
 
     const saveGame = async () => {
@@ -207,14 +259,25 @@ function Game(props) {
       }
     };
     saveGame();
-  }, [gameStatus, color]);
+  }, [gameStatus, color, movesIndex, movesNotation, opponent, user, username]);
 
   const coinToss = () => {
     // console.log("recieved coin toss");
     var num = Math.floor(Math.random() * 1000);
-    num = 22;
+    // num = 22;
+    // console.log("num", num);
     if (num % 2 === 0) {
       socket.emit("sendCoinToss", { id: sudoChallanger, sender: username });
+    } else {
+      const newPosition = [];
+      for (let i = 7; i >= 0; i--) {
+        newPosition.push(piecePosition[i]);
+      }
+
+      setPiecePosition(newPosition);
+      // setLastPiecePosition(newPosition);
+      setColor("b");
+      setTurn(false);
     }
   };
 
@@ -261,12 +324,12 @@ function Game(props) {
   };
 
   const offerDraw = () => {
-    console.log("offer draw");
+    // console.log("offer draw");
     socket.emit("offerDraw", { id: opponent, message: "draw offer" });
   };
 
   const acceptDraw = () => {
-    console.log("Draw accepted");
+    // console.log("Draw accepted");
     socket.emit("acceptDraw", { id: opponent, message: "draw accepted" });
     setGameEneded(true);
     setRecievedDrawOffer(false);
@@ -274,12 +337,12 @@ function Game(props) {
   };
 
   const declineDraw = () => {
-    console.log("Draw declined");
+    // console.log("Draw declined");
     setRecievedDrawOffer(false);
   };
 
   const resign = () => {
-    console.log("resign");
+    // console.log("resign");
     socket.emit("userResigned", { id: opponent, message: "user resigned" });
     setGameStatus("Lost");
     setGameEneded(true);

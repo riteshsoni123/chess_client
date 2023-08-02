@@ -35,7 +35,7 @@ function GameLogic(props) {
 
       let tmIndex = mIndex;
 
-      console.log("tmIndex", tmIndex);
+      // console.log("tmIndex", tmIndex);
 
       while (tmIndex + 1 < movesIndex.length) {
         const si = movesIndex[tmIndex + 1].si;
@@ -155,7 +155,7 @@ function GameLogic(props) {
 
     let s =
       piecePosition[startx][starty].id + "-" + piecePosition[endx][endy].id;
-    console.log("s", s);
+    // console.log("s", s);
     if (color === "w") {
       newMovesNotation.push({ id: movesNotation.length, first: s, second: "" });
     } else {

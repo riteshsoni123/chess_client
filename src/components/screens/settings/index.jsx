@@ -49,7 +49,7 @@ function Settings(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          console.log("settings", data);
+          // console.log("settings", data);
           setUser(data);
         } catch (error) {
           localStorage.removeItem("authToken");
@@ -89,7 +89,7 @@ function Settings(props) {
   ];
 
   const editClicked = (key) => {
-    console.log(key, userData[key]);
+    // console.log(key, userData[key]);
     setKey(key);
     setEditValue(userData[key]);
   };
@@ -97,6 +97,10 @@ function Settings(props) {
   const saveButton = async () => {
     // const tempUser = user;
     userData[key] = editValue;
+
+    if ((key === "firstname" || key === "lastname") && editValue !== "") {
+      userData[key] = editValue[0].toUpperCase() + editValue.slice(1);
+    }
 
     setUserData(userData);
     setUser(userData);
@@ -130,8 +134,10 @@ function Settings(props) {
         </div>
         <div className="w-2/4 [&>div]:mt-5">
           <div>
-            <div className="text-black text-3xl">riteshsoni123</div>
-            <div className="text-[#808080] text-2xl">Ritesh Soni</div>
+            <div className="text-black text-3xl">{userData.username}</div>
+            <div className="text-[#808080] text-2xl">
+              {userData.firstname + " " + userData.lastname}
+            </div>
           </div>
           <div>
             <div className="font-bold">About me:</div>
@@ -144,7 +150,7 @@ function Settings(props) {
           </div>
         </div>
       </div>
-      <div className="rounded-t-lg">
+      <div className="rounded-t-lg mb-10">
         <div className="bg-[#727272] rounded-t-lg flex justify-center items-center">
           <h1 className="my-3 text-white font-bold text-3xl flex items-center justify-center">
             Basic Info

@@ -55,7 +55,7 @@ export default function Login(props) {
 
         try {
           const { data } = await axios.get("/api/private", config);
-          console.log("signin", data);
+          // console.log("signin", data);
           setUser(data);
         } catch (error) {
           localStorage.removeItem("authToken");
