@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../axios";
 import "../../../index.css";
+import Timer from "./Timer";
 
 function Game(props) {
   const {
@@ -24,6 +25,10 @@ function Game(props) {
     movesNotation,
     mIndex,
     movesIndex,
+    userRunTimer,
+    setUserRunTimer,
+    opponentRunTimer,
+    setOpponentRunTimer,
   } = props;
 
   const navigate = useNavigate();
@@ -35,6 +40,8 @@ function Game(props) {
   const [recievedDrawOffer, setRecievedDrawOffer] = useState(false);
   const [gameEnded, setGameEneded] = useState(false);
   const [gameStatus, setGameStatus] = useState("");
+  const [userCountDown, setUserCountDown] = useState(300);
+  const [opponentCountDown, setOpponentCountDown] = useState(300);
   const [user, setUser] = useState({});
 
   useEffect(() => {
@@ -205,17 +212,6 @@ function Game(props) {
       } catch (error) {
         console.log(error);
       }
-
-      // try {
-      //   const { data } = await axios.get("/api/private", config);
-      //   console.log("app.js", data);
-      //   setUser(data);
-      //   setOverall(data.overall);
-      //   setWhite(data.white);
-      // } catch (error) {
-      //   localStorage.removeItem("authToken");
-      //   // setError("You are not authorized please login");
-      // }
     };
 
     updateStats();
@@ -260,6 +256,26 @@ function Game(props) {
     };
     saveGame();
   }, [gameStatus, color, movesIndex, movesNotation, opponent, user, username]);
+
+  useEffect(() => {
+    if (userCountDown < 0 && userRunTimer) {
+      console.log("expired");
+      setOpponentRunTimer(false);
+      setUserRunTimer(false);
+      setUserCountDown(0);
+
+      socket.emit("userResigned", { id: opponent, message: "user resigned" });
+      setGameStatus("Lost");
+      setGameEneded(true);
+    }
+  }, [
+    userCountDown,
+    userRunTimer,
+    setOpponentRunTimer,
+    setUserRunTimer,
+    opponent,
+    socket,
+  ]);
 
   const coinToss = () => {
     // console.log("recieved coin toss");
@@ -321,6 +337,8 @@ function Game(props) {
     setRecievedDrawOffer(false);
     setGameEneded(false);
     setPiecePosition(defaultPiecePosition);
+    setUserCountDown(300);
+    setOpponentCountDown(300);
   };
 
   const offerDraw = () => {
@@ -353,7 +371,15 @@ function Game(props) {
       <div className="w-8/10">
         <div className="bg-[#494F55] rounded-t-md h-[40px] text-xl text-[#BABCBE] flex items-center justify-between px-3">
           <div>{opponent === "" ? "unknown" : opponent}</div>
-          <div>5:00</div>
+          <Timer
+            runTimer={opponentRunTimer}
+            setRunTimer={setOpponentRunTimer}
+            countDown={opponentCountDown}
+            setCountDown={setOpponentCountDown}
+          />
+          {/* <button type="button" onClick={togglerOpponentTimer}>
+            {opponentRunTimer ? "Stop" : "Start"}
+          </button> */}
         </div>
         {piecePosition.map((row, i) => {
           return (
@@ -414,7 +440,14 @@ function Game(props) {
             <></>
           )}
           {gameStatus === "" ? <></> : <div>{`Game : ${gameStatus}`}</div>}
-          <div>5:00</div>
+          {/* <div>{}</div> */}
+          <Timer
+            runTimer={userRunTimer}
+            setRunTimer={setUserRunTimer}
+            countDown={userCountDown}
+            setCountDown={setUserCountDown}
+          />
+          {/* <button ty4 */}
         </div>
       </div>
 

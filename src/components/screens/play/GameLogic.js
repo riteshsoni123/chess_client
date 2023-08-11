@@ -22,6 +22,8 @@ function GameLogic(props) {
   const [mIndex, setMIndex] = useState(-1);
   const [movesIndex, setMovesIndex] = useState([]);
   const [movesNotation, setMovesNotation] = useState([]);
+  const [opponentRunTimer, setOpponentRunTimer] = useState(false);
+  const [userRunTimer, setUserRunTimer] = useState(false);
   // const [lastPiecePosition, setLastPiecePosition] = useState(piecePosition);
 
   useEffect(() => {
@@ -83,10 +85,15 @@ function GameLogic(props) {
       setMovesNotation(newMovesNotation);
       setMIndex(newMovesIndex.length - 1);
       setTurn((prevTurn) => !prevTurn);
+      if (!userRunTimer) togglerUserTimer();
+      if (opponentRunTimer) togglerOpponentTimer();
       // setCount((prevCount) => prevCount + 1);
     });
     return () => socket.off("recievedMoves");
   });
+
+  const togglerUserTimer = () => setUserRunTimer((t) => !t);
+  const togglerOpponentTimer = () => setOpponentRunTimer((t) => !t);
 
   const changePosition = (t, back) => {
     const newPiecePosition = [...piecePosition];
@@ -176,6 +183,8 @@ function GameLogic(props) {
     setMovesIndex(newMovesIndex);
     setMovesNotation(newMovesNotation);
     setMIndex((prevValue) => prevValue + 1);
+    if (userRunTimer) togglerUserTimer();
+    if (!opponentRunTimer) togglerOpponentTimer();
     clearSelection();
   };
 
@@ -253,6 +262,10 @@ function GameLogic(props) {
         mIndex={mIndex}
         movesIndex={movesIndex}
         color={color}
+        userRunTimer={userRunTimer}
+        setUserRunTimer={setUserRunTimer}
+        opponentRunTimer={opponentRunTimer}
+        setOpponentRunTimer={setOpponentRunTimer}
       />
     </div>
   );
