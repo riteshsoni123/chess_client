@@ -254,25 +254,18 @@ function Play(props) {
   const [socket, setSocket] = useState();
   const movements = [];
 
-  // useEffect(() => {
-  //   console.log("running useEffect");
-  //   console.log(selectedPosition);
-  // }, [selectedPosition]);
-
   const clearMovementsArray = () => {
     while (movements.length > 0) {
       movements.pop();
     }
   };
 
-  const kingChecker = () => {
-    // console.log("hi");
-
+  const kingChecker = (newPiecePosition) => {
     let r = -1,
       c = -1;
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (piecePosition[i][j].piece === `${color}_king`) {
+        if (newPiecePosition[i][j].piece === `${color}_king`) {
           r = i;
           c = j;
           break;
@@ -283,24 +276,30 @@ function Play(props) {
       }
     }
 
-    // console.log(r, c);
-
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        const piece = piecePosition[i][j].piece;
+        const piece = newPiecePosition[i][j].piece;
         if (piece[0] !== color) {
           clearMovementsArray();
-          movementsGenerator(piece.substring(2, piece.length), i, j, piece[0]);
+          movementsGenerator(
+            piece.substring(2, piece.length),
+            i,
+            j,
+            piece[0],
+            newPiecePosition
+          );
         }
         for (let k = 0; k < movements.length; k++) {
           const { x, y } = movements[k];
           if (x === r && y === c) {
             // console.log("bazinga");
+            clearMovementsArray();
             return false;
           }
         }
       }
     }
+    clearMovementsArray();
     return true;
   };
 
@@ -318,204 +317,768 @@ function Play(props) {
     setPiecePosition(newPiecePosition);
   };
 
-  const pawnKillingMovement = (moves, x, y, tcolor) => {
+  const pawnKillingMovement = (
+    moves,
+    x,
+    y,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
-    if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
+    if (newPiecePosition[x][y].piece !== "" && moves < 1) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
         movements.push({ x: x, y: y });
       }
       return;
     }
     if (tcolor === color) {
-      pawnKillingMovement(moves - 1, x - 1, y + 1, tcolor);
-      pawnKillingMovement(moves - 1, x - 1, y - 1, tcolor);
+      pawnKillingMovement(
+        moves - 1,
+        x - 1,
+        y + 1,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      pawnKillingMovement(
+        moves - 1,
+        x - 1,
+        y - 1,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else {
-      pawnKillingMovement(moves - 1, x + 1, y + 1, tcolor);
-      pawnKillingMovement(moves - 1, x + 1, y - 1, tcolor);
+      pawnKillingMovement(
+        moves - 1,
+        x + 1,
+        y + 1,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      pawnKillingMovement(
+        moves - 1,
+        x + 1,
+        y - 1,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     }
   };
 
-  const pawnMovement = (moves, x, y, limit) => {
+  const pawnMovement = (
+    moves,
+    x,
+    y,
+    limit,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
-    if (piecePosition[x][y].piece !== "" && moves < limit) {
+    if (newPiecePosition[x][y].piece !== "" && moves < limit) {
       return;
     }
 
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
     movements.push({ x: x, y: y });
-    pawnMovement(moves - 1, x - 1, y, limit);
+    // console.log(x, y);
+    pawnMovement(
+      moves - 1,
+      x - 1,
+      y,
+      limit,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
   };
 
-  const rookMovement = (moves, x, y, direction, tcolor) => {
+  const rookMovement = (
+    moves,
+    x,
+    y,
+    direction,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
-    if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
+    if (newPiecePosition[x][y].piece !== "" && moves < 1000) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
         movements.push({ x: x, y: y });
       }
       return;
     }
-
-    movements.push({ x: x, y: y });
-    if (direction === "n") rookMovement(moves - 1, x - 1, y, direction, tcolor);
-    else if (direction === "s")
-      rookMovement(moves - 1, x + 1, y, direction, tcolor);
-    else if (direction === "w")
-      rookMovement(moves - 1, x, y - 1, direction, tcolor);
-    else if (direction === "e")
-      rookMovement(moves - 1, x, y + 1, direction, tcolor);
-  };
-
-  const knightMovement = (moves, x, y, tcolor) => {
-    if (moves === -1) return;
-    if (x > 7 || x < 0 || y > 7 || y < 0) return;
-
-    if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
-        movements.push({ x: x, y: y });
-      }
-      return;
-    }
-
-    movements.push({ x: x, y: y });
-    knightMovement(moves - 1, x + 2, y + 1, tcolor);
-    knightMovement(moves - 1, x + 2, y - 1, tcolor);
-    knightMovement(moves - 1, x - 2, y + 1, tcolor);
-    knightMovement(moves - 1, x - 2, y - 1, tcolor);
-    knightMovement(moves - 1, x + 1, y + 2, tcolor);
-    knightMovement(moves - 1, x + 1, y - 2, tcolor);
-    knightMovement(moves - 1, x - 1, y + 2, tcolor);
-    knightMovement(moves - 1, x - 1, y - 2, tcolor);
-  };
-
-  const bishopMovement = (moves, x, y, direction, tcolor) => {
-    if (moves === -1) return;
-    if (x > 7 || x < 0 || y > 7 || y < 0) return;
-
-    if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
-        movements.push({ x: x, y: y });
-      }
-      return;
-    }
-
-    movements.push({ x: x, y: y });
-    if (direction === "ne")
-      bishopMovement(moves - 1, x - 1, y + 1, direction, tcolor);
-    else if (direction === "se")
-      bishopMovement(moves - 1, x + 1, y + 1, direction, tcolor);
-    else if (direction === "sw")
-      bishopMovement(moves - 1, x + 1, y - 1, direction, tcolor);
-    else if (direction === "nw")
-      bishopMovement(moves - 1, x - 1, y - 1, direction, tcolor);
-  };
-  const queenMovement = (moves, x, y, direction, tcolor) => {
-    if (moves === -1) return;
-    if (x > 7 || x < 0 || y > 7 || y < 0) return;
-
-    if (piecePosition[x][y].piece !== "" && moves < 1000) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
-        movements.push({ x: x, y: y });
-      }
-      return;
-    }
-
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
     movements.push({ x: x, y: y });
     if (direction === "n")
-      queenMovement(moves - 1, x - 1, y, direction, tcolor);
-    else if (direction === "e")
-      queenMovement(moves - 1, x, y + 1, direction, tcolor);
+      rookMovement(
+        moves - 1,
+        x - 1,
+        y,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     else if (direction === "s")
-      queenMovement(moves - 1, x + 1, y, direction, tcolor);
+      rookMovement(
+        moves - 1,
+        x + 1,
+        y,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     else if (direction === "w")
-      queenMovement(moves - 1, x, y - 1, direction, tcolor);
-    else if (direction === "ne")
-      queenMovement(moves - 1, x - 1, y + 1, direction, tcolor);
-    else if (direction === "se")
-      queenMovement(moves - 1, x + 1, y + 1, direction, tcolor);
-    else if (direction === "sw")
-      queenMovement(moves - 1, x + 1, y - 1, direction, tcolor);
-    else if (direction === "nw")
-      queenMovement(moves - 1, x - 1, y - 1, direction, tcolor);
+      rookMovement(
+        moves - 1,
+        x,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "e")
+      rookMovement(
+        moves - 1,
+        x,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
   };
-  const kingMovement = (moves, x, y, tcolor) => {
+
+  const knightMovement = (
+    moves,
+    x,
+    y,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
     if (moves === -1) return;
     if (x > 7 || x < 0 || y > 7 || y < 0) return;
 
-    if (piecePosition[x][y].piece !== "" && moves < 1) {
-      if (piecePosition[x][y].piece[0] !== tcolor) {
+    if (newPiecePosition[x][y].piece !== "" && moves < 1) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
         movements.push({ x: x, y: y });
       }
       return;
     }
-
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
     movements.push({ x: x, y: y });
-    kingMovement(moves - 1, x - 1, y, tcolor);
-    kingMovement(moves - 1, x, y + 1, tcolor);
-    kingMovement(moves - 1, x + 1, y, tcolor);
-    kingMovement(moves - 1, x, y - 1, tcolor);
-
-    kingMovement(moves - 1, x - 1, y + 1, tcolor);
-    kingMovement(moves - 1, x + 1, y + 1, tcolor);
-    kingMovement(moves - 1, x + 1, y - 1, tcolor);
-    kingMovement(moves - 1, x - 1, y - 1, tcolor);
+    knightMovement(
+      moves - 1,
+      x + 2,
+      y + 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x + 2,
+      y - 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x - 2,
+      y + 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x - 2,
+      y - 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x + 1,
+      y + 2,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x + 1,
+      y - 2,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x - 1,
+      y + 2,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    knightMovement(
+      moves - 1,
+      x - 1,
+      y - 2,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
   };
 
-  const movementsGenerator = (piece, x, y, tcolor) => {
+  const bishopMovement = (
+    moves,
+    x,
+    y,
+    direction,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
+    if (moves === -1) return;
+    if (x > 7 || x < 0 || y > 7 || y < 0) return;
+
+    if (newPiecePosition[x][y].piece !== "" && moves < 1000) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
+        movements.push({ x: x, y: y });
+      }
+      return;
+    }
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
+    movements.push({ x: x, y: y });
+    if (direction === "ne")
+      bishopMovement(
+        moves - 1,
+        x - 1,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "se")
+      bishopMovement(
+        moves - 1,
+        x + 1,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "sw")
+      bishopMovement(
+        moves - 1,
+        x + 1,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "nw")
+      bishopMovement(
+        moves - 1,
+        x - 1,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+  };
+  const queenMovement = (
+    moves,
+    x,
+    y,
+    direction,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
+    if (moves === -1) return;
+    if (x > 7 || x < 0 || y > 7 || y < 0) return;
+
+    if (newPiecePosition[x][y].piece !== "" && moves < 1000) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
+        movements.push({ x: x, y: y });
+      }
+      return;
+    }
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
+    movements.push({ x: x, y: y });
+    if (direction === "n")
+      queenMovement(
+        moves - 1,
+        x - 1,
+        y,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "e")
+      queenMovement(
+        moves - 1,
+        x,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "s")
+      queenMovement(
+        moves - 1,
+        x + 1,
+        y,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "w")
+      queenMovement(
+        moves - 1,
+        x,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "ne")
+      queenMovement(
+        moves - 1,
+        x - 1,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "se")
+      queenMovement(
+        moves - 1,
+        x + 1,
+        y + 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "sw")
+      queenMovement(
+        moves - 1,
+        x + 1,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+    else if (direction === "nw")
+      queenMovement(
+        moves - 1,
+        x - 1,
+        y - 1,
+        direction,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+  };
+  const kingMovement = (
+    moves,
+    x,
+    y,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
+    if (moves === -1) return;
+    if (x > 7 || x < 0 || y > 7 || y < 0) return;
+
+    if (newPiecePosition[x][y].piece !== "" && moves < 1) {
+      if (newPiecePosition[x][y].piece[0] !== tcolor) {
+        if (isPseudo) pseudoMovements.push({ x: x, y: y });
+        movements.push({ x: x, y: y });
+      }
+      return;
+    }
+    if (isPseudo) pseudoMovements.push({ x: x, y: y });
+    movements.push({ x: x, y: y });
+    kingMovement(
+      moves - 1,
+      x - 1,
+      y,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x,
+      y + 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x + 1,
+      y,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x,
+      y - 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+
+    kingMovement(
+      moves - 1,
+      x - 1,
+      y + 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x + 1,
+      y + 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x + 1,
+      y - 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    kingMovement(
+      moves - 1,
+      x - 1,
+      y - 1,
+      tcolor,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+  };
+
+  const movementsGenerator = (
+    piece,
+    x,
+    y,
+    tcolor,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
     // console.log(tcolor, color);
+    // console.log(piece);
     if (piece === "pawn") {
       if (tcolor !== color) {
         if (x === 1) {
-          pawnMovement(2, x, y, 2);
+          pawnMovement(2, x, y, 2, newPiecePosition, isPseudo, pseudoMovements);
         } else {
-          pawnMovement(1, x, y, 1);
+          pawnMovement(1, x, y, 1, newPiecePosition, isPseudo, pseudoMovements);
         }
       } else {
         if (x === 6) {
-          pawnMovement(2, x, y, 2);
+          pawnMovement(2, x, y, 2, newPiecePosition, isPseudo, pseudoMovements);
         } else {
-          pawnMovement(1, x, y, 1);
+          pawnMovement(1, x, y, 1, newPiecePosition, isPseudo, pseudoMovements);
         }
       }
-      pawnKillingMovement(1, x, y, tcolor);
+      pawnKillingMovement(
+        1,
+        x,
+        y,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else if (piece === "rook") {
-      rookMovement(1000, x, y, "n", tcolor);
-      rookMovement(1000, x, y, "s", tcolor);
-      rookMovement(1000, x, y, "w", tcolor);
-      rookMovement(1000, x, y, "e", tcolor);
+      rookMovement(
+        1000,
+        x,
+        y,
+        "n",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      rookMovement(
+        1000,
+        x,
+        y,
+        "s",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      rookMovement(
+        1000,
+        x,
+        y,
+        "w",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      rookMovement(
+        1000,
+        x,
+        y,
+        "e",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else if (piece === "knight") {
-      knightMovement(1, x, y, tcolor);
+      knightMovement(
+        1,
+        x,
+        y,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else if (piece === "bishop") {
-      bishopMovement(1000, x, y, "ne", tcolor);
-      bishopMovement(1000, x, y, "se", tcolor);
-      bishopMovement(1000, x, y, "sw", tcolor);
-      bishopMovement(1000, x, y, "nw", tcolor);
+      bishopMovement(
+        1000,
+        x,
+        y,
+        "ne",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      bishopMovement(
+        1000,
+        x,
+        y,
+        "se",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      bishopMovement(
+        1000,
+        x,
+        y,
+        "sw",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      bishopMovement(
+        1000,
+        x,
+        y,
+        "nw",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else if (piece === "queen") {
-      queenMovement(1000, x, y, "n", tcolor);
-      queenMovement(1000, x, y, "e", tcolor);
-      queenMovement(1000, x, y, "s", tcolor);
-      queenMovement(1000, x, y, "w", tcolor);
+      queenMovement(
+        1000,
+        x,
+        y,
+        "n",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "e",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "s",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "w",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
 
-      queenMovement(1000, x, y, "ne", tcolor);
-      queenMovement(1000, x, y, "se", tcolor);
-      queenMovement(1000, x, y, "sw", tcolor);
-      queenMovement(1000, x, y, "nw", tcolor);
+      queenMovement(
+        1000,
+        x,
+        y,
+        "ne",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "se",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "sw",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
+      queenMovement(
+        1000,
+        x,
+        y,
+        "nw",
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     } else if (piece === "king") {
-      kingMovement(1, x, y, tcolor);
+      kingMovement(
+        1,
+        x,
+        y,
+        tcolor,
+        newPiecePosition,
+        isPseudo,
+        pseudoMovements
+      );
     }
   };
 
-  const calculateMovements = (id, piece) => {
+  const calculateMovements = (
+    id,
+    piece,
+    newPiecePosition = piecePosition,
+    isPseudo = false,
+    pseudoMovements = []
+  ) => {
+    // console.log(newPiecePosition);
     let x = -1,
       y = -1;
 
     clearMovementsArray();
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
-        if (piecePosition[i][j].id === id) {
+        if (newPiecePosition[i][j].id === id) {
           x = i;
           y = j;
           break;
@@ -523,13 +1086,71 @@ function Play(props) {
       }
     }
 
-    movementsGenerator(piece, x, y, color);
+    movementsGenerator(
+      piece,
+      x,
+      y,
+      color,
+      newPiecePosition,
+      isPseudo,
+      pseudoMovements
+    );
+    // console.log("calculate movements", movements);
+    // setPseudoMovements(movements);
     selectPositions();
+  };
+
+  const validMoves = (newPiecePosition, pseudoMovements) => {
+    let count = 0;
+
+    const startx = pseudoMovements[0].x,
+      starty = pseudoMovements[0].y;
+    for (let i = 1; i < pseudoMovements.length; i++) {
+      const endx = pseudoMovements[i].x,
+        endy = pseudoMovements[i].y;
+
+      const deletedPiece = newPiecePosition[endx][endy].piece;
+
+      newPiecePosition[endx][endy].piece =
+        newPiecePosition[startx][starty].piece;
+      newPiecePosition[startx][starty].piece = "";
+
+      if (kingChecker(newPiecePosition)) count++;
+
+      newPiecePosition[startx][starty].piece =
+        newPiecePosition[endx][endy].piece;
+      newPiecePosition[endx][endy].piece = deletedPiece;
+    }
+    return count;
+  };
+
+  const checkStatus = (newPiecePosition) => {
+    // console.log(newPiecePosition);
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (newPiecePosition[i][j].piece[0] === color) {
+          const piece = newPiecePosition[i][j].piece;
+          console.log(piece, i, j);
+          const pseudoMovements = [];
+          calculateMovements(
+            newPiecePosition[i][j].id,
+            piece.substring(2, piece.length),
+            newPiecePosition,
+            true,
+            pseudoMovements
+          );
+          const numOfValidMoves = validMoves(newPiecePosition, pseudoMovements);
+          if (numOfValidMoves > 0) return true;
+        }
+      }
+    }
+    return false;
   };
 
   return (
     <div className="container mx-auto">
       <GameLogic
+        movements={movements}
         piecePosition={piecePosition}
         setPiecePosition={setPiecePosition}
         calculateMovements={calculateMovements}
@@ -543,6 +1164,8 @@ function Play(props) {
         socket={socket}
         setSocket={setSocket}
         defaultPiecePosition={defaultPiecePosition}
+        // pseudoMovements={pseudoMovements}
+        checkStatus={checkStatus}
       />
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import io from "socket.io-client";
 import Game from "./Game";
 
 function GameLogic(props) {
@@ -16,6 +15,7 @@ function GameLogic(props) {
     socket,
     setSocket,
     defaultPiecePosition,
+    checkStatus,
   } = props;
   const [opponent, setOpponent] = useState("");
   const [turn, setTurn] = useState(true);
@@ -24,8 +24,11 @@ function GameLogic(props) {
   const [movesNotation, setMovesNotation] = useState([]);
   const [opponentRunTimer, setOpponentRunTimer] = useState(false);
   const [userRunTimer, setUserRunTimer] = useState(false);
-  // const [lastPiecePosition, setLastPiecePosition] = useState(piecePosition);
+  const [gameStatus, setGameStatus] = useState("");
+  const [recievedDrawOffer, setRecievedDrawOffer] = useState(false);
+  const [gameEnded, setGameEneded] = useState(false);
 
+  // recievedMoves
   useEffect(() => {
     if (socket == null) return;
 
@@ -57,6 +60,22 @@ function GameLogic(props) {
       newPiecePosition[7 - endx][endy].piece =
         newPiecePosition[7 - startx][starty].piece;
       newPiecePosition[7 - startx][starty].piece = deletedPiece;
+
+      //------------------------------------------------------------------
+      // code to check for checkmate or stalemate
+
+      if (!checkStatus(newPiecePosition)) {
+        if (!kingChecker(newPiecePosition)) {
+          console.log("checkmate");
+          resign();
+        } else {
+          console.log("stalemate");
+          acceptDraw();
+        }
+      }
+      clearSelection();
+
+      //---------------------------------------------------------------------
 
       newMovesIndex.push({
         si: 7 - startx,
@@ -94,6 +113,29 @@ function GameLogic(props) {
 
   const togglerUserTimer = () => setUserRunTimer((t) => !t);
   const togglerOpponentTimer = () => setOpponentRunTimer((t) => !t);
+
+  const offerDraw = () => {
+    // console.log("offer draw");
+    socket.emit("offerDraw", { id: opponent, message: "draw offer" });
+  };
+
+  const acceptDraw = () => {
+    socket.emit("acceptDraw", { id: opponent, message: "draw accepted" });
+    setGameEneded(true);
+    setRecievedDrawOffer(false);
+    setGameStatus("Drawn");
+  };
+
+  const declineDraw = () => {
+    // console.log("Draw declined");
+    setRecievedDrawOffer(false);
+  };
+
+  const resign = () => {
+    socket.emit("userResigned", { id: opponent, message: "user resigned" });
+    setGameStatus("Lost");
+    setGameEneded(true);
+  };
 
   const changePosition = (t, back) => {
     const newPiecePosition = [...piecePosition];
@@ -141,7 +183,7 @@ function GameLogic(props) {
     setSelectedPosition({});
   };
 
-  const movePiece = (startx, starty, endx, endy, deletedPiece = "") => {
+  const movePiece = async (startx, starty, endx, endy, deletedPiece = "") => {
     if (!turn || mIndex + 1 !== movesIndex.length) return;
     const newPiecePosition = [...piecePosition];
     const newMovesIndex = [...movesIndex];
@@ -150,7 +192,14 @@ function GameLogic(props) {
     let tempDeletedPiece = piecePosition[endx][endy].piece;
 
     newPiecePosition[endx][endy].piece = newPiecePosition[startx][starty].piece;
-    newPiecePosition[startx][starty].piece = deletedPiece;
+    newPiecePosition[startx][starty].piece = "";
+
+    if (!kingChecker(newPiecePosition)) {
+      newPiecePosition[startx][starty].piece =
+        newPiecePosition[endx][endy].piece;
+      newPiecePosition[endx][endy].piece = tempDeletedPiece;
+      return;
+    }
 
     newMovesIndex.push({
       si: startx,
@@ -200,12 +249,9 @@ function GameLogic(props) {
           piecePosition[r][c].piece[0] !== color)
       ) {
         const { x, y } = selectedPosition;
-        const deletedPiece = piecePosition[r][c].piece;
         movePiece(x, y, r, c);
-        if (!kingChecker()) {
-          movePiece(r, c, x, y, deletedPiece);
-        }
       }
+      clearSelection();
       return;
     }
 
@@ -216,27 +262,23 @@ function GameLogic(props) {
       clearSelection();
       return;
     }
-    // else if (
-    //   piecePosition[r][c].piece[0] === color &&
-    //   piecePosition[r][c].selected
-    // ) {
-    //   clearSelection();
-    //   return;
-    // }
 
     if (piecePosition[r][c].piece[0] !== color) {
+      clearSelection();
       return;
     }
-    // else if (piecePosition[r][c].piece[0] !== color) {
-    //   return;
-    // }
+
     clearSelection();
 
     const newPiecePosition = [...piecePosition];
 
+    // console.log(newPiecePosition[r][c].piece, r, c);
+
     const piece = newPiecePosition[r][c].piece;
 
+    // console.log(demoPiecePosition);
     calculateMovements(id, piece.substring(2, piece.length));
+    // console.log(movements);
 
     setPiecePosition(newPiecePosition);
   };
@@ -245,10 +287,8 @@ function GameLogic(props) {
       <Game
         piecePosition={piecePosition}
         setPiecePosition={setPiecePosition}
-        // setLastPiecePosition={setLastPiecePosition}
         positionClicked={positionClicked}
         username={username}
-        // setUsername={setUsername}
         setColor={setColor}
         socket={socket}
         setSocket={setSocket}
@@ -266,6 +306,16 @@ function GameLogic(props) {
         setUserRunTimer={setUserRunTimer}
         opponentRunTimer={opponentRunTimer}
         setOpponentRunTimer={setOpponentRunTimer}
+        gameStatus={gameStatus}
+        setGameStatus={setGameStatus}
+        offerDraw={offerDraw}
+        declineDraw={declineDraw}
+        acceptDraw={acceptDraw}
+        resign={resign}
+        recievedDrawOffer={recievedDrawOffer}
+        setRecievedDrawOffer={setRecievedDrawOffer}
+        gameEnded={gameEnded}
+        setGameEneded={setGameEneded}
       />
     </div>
   );

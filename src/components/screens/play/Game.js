@@ -29,6 +29,16 @@ function Game(props) {
     setUserRunTimer,
     opponentRunTimer,
     setOpponentRunTimer,
+    gameStatus,
+    setGameStatus,
+    acceptDraw,
+    declineDraw,
+    offerDraw,
+    resign,
+    recievedDrawOffer,
+    setRecievedDrawOffer,
+    gameEnded,
+    setGameEneded,
   } = props;
 
   const navigate = useNavigate();
@@ -37,9 +47,7 @@ function Game(props) {
   const [message, setMessage] = useState("");
   const [challangeDecliner, setChallangeDecliner] = useState("");
   const [chats, setChats] = useState([]);
-  const [recievedDrawOffer, setRecievedDrawOffer] = useState(false);
-  const [gameEnded, setGameEneded] = useState(false);
-  const [gameStatus, setGameStatus] = useState("");
+
   const [userCountDown, setUserCountDown] = useState(300);
   const [opponentCountDown, setOpponentCountDown] = useState(300);
   const [user, setUser] = useState({});
@@ -78,6 +86,7 @@ function Game(props) {
     return () => newSocket.close();
   }, [username, setSocket]);
 
+  // recieveChallange
   useEffect(() => {
     if (socket == null) return;
 
@@ -88,6 +97,7 @@ function Game(props) {
     return () => socket.off("recieveChallange");
   });
 
+  // acceptedChallange
   useEffect(() => {
     if (socket == null) return;
 
@@ -98,6 +108,7 @@ function Game(props) {
     return () => socket.off("acceptedChallange");
   });
 
+  // recieveMessage
   useEffect(() => {
     if (socket == null) return;
 
@@ -115,6 +126,7 @@ function Game(props) {
     return () => socket.off("recieveMessage");
   });
 
+  // declineChallange
   useEffect(() => {
     if (socket == null) return;
 
@@ -125,6 +137,7 @@ function Game(props) {
     return () => socket.off("declineChallange");
   });
 
+  // recieveCoinToss
   useEffect(() => {
     if (socket == null) return;
 
@@ -146,6 +159,7 @@ function Game(props) {
     return () => socket.off("recieveCoinToss");
   });
 
+  // recieveDrawOffer
   useEffect(() => {
     if (socket == null) return;
 
@@ -156,6 +170,7 @@ function Game(props) {
     return () => socket.off("recieveDrawOffer");
   });
 
+  // drawAccepted
   useEffect(() => {
     if (socket == null) return;
 
@@ -166,6 +181,8 @@ function Game(props) {
     });
     return () => socket.off("recieveDrawOffer");
   });
+
+  // opponentResigned
   useEffect(() => {
     if (socket == null) return;
 
@@ -275,6 +292,8 @@ function Game(props) {
     setUserRunTimer,
     opponent,
     socket,
+    setGameStatus,
+    setGameEneded,
   ]);
 
   const coinToss = () => {
@@ -341,31 +360,6 @@ function Game(props) {
     setOpponentCountDown(300);
   };
 
-  const offerDraw = () => {
-    // console.log("offer draw");
-    socket.emit("offerDraw", { id: opponent, message: "draw offer" });
-  };
-
-  const acceptDraw = () => {
-    // console.log("Draw accepted");
-    socket.emit("acceptDraw", { id: opponent, message: "draw accepted" });
-    setGameEneded(true);
-    setRecievedDrawOffer(false);
-    setGameStatus("Drawn");
-  };
-
-  const declineDraw = () => {
-    // console.log("Draw declined");
-    setRecievedDrawOffer(false);
-  };
-
-  const resign = () => {
-    // console.log("resign");
-    socket.emit("userResigned", { id: opponent, message: "user resigned" });
-    setGameStatus("Lost");
-    setGameEneded(true);
-  }; // console.log("recieved coin toss", data);
-
   return (
     <div className="container m-auto flex flex-row justify-center items-center w-2/3 mt-10 [&>div]:shadow-xl">
       <div className="w-8/10">
@@ -377,9 +371,6 @@ function Game(props) {
             countDown={opponentCountDown}
             setCountDown={setOpponentCountDown}
           />
-          {/* <button type="button" onClick={togglerOpponentTimer}>
-            {opponentRunTimer ? "Stop" : "Start"}
-          </button> */}
         </div>
         {piecePosition.map((row, i) => {
           return (
@@ -440,14 +431,12 @@ function Game(props) {
             <></>
           )}
           {gameStatus === "" ? <></> : <div>{`Game : ${gameStatus}`}</div>}
-          {/* <div>{}</div> */}
           <Timer
             runTimer={userRunTimer}
             setRunTimer={setUserRunTimer}
             countDown={userCountDown}
             setCountDown={setUserCountDown}
           />
-          {/* <button ty4 */}
         </div>
       </div>
 
